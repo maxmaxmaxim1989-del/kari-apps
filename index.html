@@ -645,17 +645,21 @@ function generateAndSave() {
   <div class="footer">КОРМ · KARI Кавказ · ${dateStr}</div>
   </body></html>`;
 
-  // Открываем PDF в новом окне для печати/сохранения
-  const w = window.open('', '_blank');
-  w.document.write(pdfHtml);
-  w.document.close();
-  setTimeout(() => w.print(), 500);
+  // Скачиваем HTML файл (работает в Telegram Mini App)
+  const blob = new Blob([pdfHtml], {type:'text/html;charset=utf-8'});
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = 'KORM_' + currentShop.id + '_' + dateStr.replace(/\./g,'-') + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
 
-  // Показываем результат
   document.getElementById('pdf-result').innerHTML = `
-    <div class="ok-box">✓ PDF сформирован. Сохрани через «Печать → Сохранить как PDF» или «Поделиться → Telegram»</div>
+    <div class="ok-box">✓ Файл скачан. Открой в Файлах → Поделиться → Telegram</div>
     <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;">
-      Отправь PDF директором магазина и себе в Telegram. Бот напомнит по срокам замечаний.
+      Отправь файл себе в Telegram. Бот напомнит по срокам.
     </div>`;
 }
 
