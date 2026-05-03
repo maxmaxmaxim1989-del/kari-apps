@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Тренировки">
+<title>Тренировки · База</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --red:#C0001A;--bg:#F2F2F7;--panel:#fff;--border:#E4E4E8;
+  --text:#1A1A2E;--muted:#888;--sub:#555;
+  --green:#1B7A3E;--green-bg:#E8F5EE;--green-border:#A7D7BC;
+  --amber:#B45309;--amber-bg:#FEF3C7;--amber-border:#FCD34D;
+  --blue:#1D4ED8;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+  --red-bg:#FEE2E2;--red-border:#FCA5A5;
+  --purple:#7C3AED;--purple-bg:#F5F3FF;--purple-border:#C4B5FD;
+  --orange:#C2410C;--orange-bg:#FFF7ED;--orange-border:#FED7AA;
+  --nav-h:58px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;padding-bottom:calc(var(--nav-h)+16px);}
+
+.hdr{background:var(--text);padding:12px 16px 10px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:4px;}
+.logo-sub{font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.hdr-badge{margin-left:auto;background:var(--red);color:#fff;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;}
+
+.search-wrap{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;position:relative;}
+.search-icon-pos{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
+.search-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 32px;font-family:'Manrope',sans-serif;font-size:13px;border-radius:8px;outline:none;}
+.search-input:focus{border-color:var(--text);}
+
+.content{padding:12px 14px;}
+.section{margin-bottom:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;scroll-margin-top:110px;}
+.section-hdr{display:flex;align-items:center;padding:12px 14px;cursor:pointer;gap:10px;user-select:none;}
+.section-hdr:active{background:#F5F5F5;}
+.section-icon{font-size:20px;flex-shrink:0;}
+.section-title{font-size:14px;font-weight:800;flex:1;}
+.section-count{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 7px;border-radius:10px;}
+.section-arrow{color:var(--muted);font-size:16px;transition:transform 0.2s;flex-shrink:0;}
+.section.open .section-arrow{transform:rotate(90deg);}
+.section-body{display:none;border-top:1px solid var(--border);}
+.section.open .section-body{display:block;}
+
+.tab-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--bg);}
+.pill-btn{background:#fff;border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Manrope',sans-serif;transition:all 0.15s;}
+.pill-btn.active{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+.pane{display:none;padding:12px;animation:fadeIn 0.2s ease;}
+.pane.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--card-accent,var(--red));}
+.card-title{font-weight:800;font-size:13px;margin-bottom:9px;padding-left:4px;}
+
+/* WORKOUT TABLE */
+.ex-table{width:100%;border-collapse:collapse;font-size:12px;}
+.ex-table th{background:var(--text);color:#fff;padding:7px 8px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.ex-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top;}
+.ex-table tr:last-child td{border-bottom:none;}
+.ex-table tr:nth-child(even) td{background:#FAFAFA;}
+.ex-name{font-weight:700;color:var(--text);font-size:12px;}
+.ex-sets{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red);white-space:nowrap;}
+.ex-note{font-size:10px;color:var(--muted);margin-top:2px;}
+.tag-light{display:inline-block;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px;}
+.tag-heavy{display:inline-block;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px;}
+.tag-base{display:inline-block;background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px;}
+
+/* SUPERSET */
+.superset{background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:8px;padding:10px;margin-bottom:8px;}
+.superset-label{font-size:9px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.superset-item{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--purple-border);}
+.superset-item:last-child{border-bottom:none;}
+.superset-name{font-size:12px;font-weight:600;color:var(--text);}
+.superset-sets{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--purple);}
+
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.rule-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--sub);line-height:1.5;}
+.rule-icon{flex-shrink:0;width:18px;text-align:center;}
+
+.steps{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.step{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5;}
+.step-num{min-width:22px;height:22px;background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.step-text{color:var(--sub);padding-top:2px;}
+.step-text strong{color:var(--text);}
+
+.warn{background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C;margin-top:8px;line-height:1.5;}
+.info{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--blue);margin-top:8px;line-height:1.5;}
+.success{background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--green);margin-top:8px;line-height:1.5;}
+.note{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--amber);margin-top:8px;line-height:1.5;}
+
+.formula{background:var(--text);color:#fff;border-radius:8px;padding:12px 14px;text-align:center;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;letter-spacing:.5px;}
+.formula-red{background:var(--red);}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.stat-box{background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px;}
+@media(min-width:520px){.grid.g2{grid-template-columns:1fr 1fr}}
+
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{background:var(--text);color:#fff;padding:7px 9px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;}
+.tbl td{padding:6px 9px;border-bottom:1px solid var(--border);color:var(--sub);vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:#FAFAFA;}
+
+.divider{height:1px;background:var(--border);margin:12px 0;}
+
+/* WEEK PLAN */
+.week-day{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.week-day:last-child{border-bottom:none;}
+.day-badge{min-width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;flex-shrink:0;text-align:center;line-height:1.2;}
+.day-badge.train{background:var(--red);color:#fff;}
+.day-badge.rest{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+.day-badge.yoga{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.day-info{flex:1;}
+.day-title{font-weight:800;font-size:13px;}
+.day-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+
+/* FOOD CARD */
+.food-time{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.food-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.food-item:last-child{border-bottom:none;}
+.food-g{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red);font-weight:700;min-width:48px;text-align:right;}
+
+/* PRES CIRCUIT */
+.circuit-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.circuit-item:last-child{border-bottom:none;}
+.circuit-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);min-width:28px;}
+.circuit-name{flex:1;font-weight:700;font-size:13px;}
+.circuit-sets{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red);font-weight:700;}
+
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(255,255,255,0.97);border-top:2px solid var(--border);display:flex;align-items:stretch;z-index:200;backdrop-filter:blur(10px);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:8px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;transition:color 0.15s;padding:4px 2px;}
+.bnav-btn.active{color:var(--red);}
+.bnav-icon{font-size:18px;line-height:1;width:34px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px;}
+.scroll-top{position:fixed;bottom:calc(var(--nav-h)+12px);right:14px;background:var(--text);color:#fff;width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:16px;z-index:150;}
+.scroll-top.show{display:flex;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="logo">WORKOUT</div>
+    <div class="logo-sub">67 кг · 170 см · 3×неделя</div>
+  </div>
+  <div class="hdr-badge">5 блоков</div>
+</header>
+
+<div class="search-wrap" style="position:relative;">
+  <span class="search-icon-pos">🔍</span>
+  <input class="search-input" type="text" placeholder="Поиск по упражнениям..." id="search" oninput="doSearch(this.value)">
+</div>
+
+<div class="content" id="main-content">
+
+<!-- ═══ БЛОК 1: МОЯ ПРОГРАММА ═══ -->
+<div class="section open" id="g-program" data-group="program">
+  <div class="section-hdr" onclick="toggleSection('g-program')">
+    <span class="section-icon">💪</span>
+    <span class="section-title">Моя программа 3×неделя</span>
+    <span class="section-count">Т1 · Т2 · Т3</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-program','p-schema',this)">📋 Схема</button>
+      <button class="pill-btn" onclick="showPane('g-program','p-t1',this)">💪 Т1 Грудь+Бицепс</button>
+      <button class="pill-btn" onclick="showPane('g-program','p-t2',this)">🔙 Т2 Спина+Плечи</button>
+      <button class="pill-btn" onclick="showPane('g-program','p-t3',this)">🦵 Т3 Ноги+Трицепс</button>
+    </div>
+
+    <div class="pane active" id="p-schema">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⚡ Принцип: тяжёлая + лёгкая группа</div>
+        <table class="tbl">
+          <tr><th>Группа</th><th>Нагрузка</th></tr>
+          <tr><td>Грудь</td><td>1 тяжёлая (Т1) + 1 лёгкая (Т2)</td></tr>
+          <tr><td>Спина</td><td>1 тяжёлая (Т2) + 1 лёгкая (Т1)</td></tr>
+          <tr><td>Плечи</td><td>1 тяжёлая (Т2) + 1 лёгкая (Т3)</td></tr>
+          <tr><td>Руки (бицепс+трицепс)</td><td>2 полных нагрузки — получают много работы</td></tr>
+          <tr><td>Ноги</td><td>1 тяжёлая (Т3) + лёгкий присед на Т1</td></tr>
+        </table>
+        <div class="info">💡 Каждая группа прорабатывается дважды в неделю — это оптимально для роста при 3 тренировках.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">🗓️ Чередование нагрузки в месяц</div>
+        <table class="tbl">
+          <tr><th>Режим</th><th>Повторения</th><th>Вес</th><th>Частота</th></tr>
+          <tr><td><strong>На силу</strong></td><td>3–5 повт.</td><td>Максимальный</td><td>2× в месяц на каждую тренировку</td></tr>
+          <tr><td><strong>На гипертрофию</strong></td><td>8–10 повт.</td><td>Рабочий</td><td>Остальные тренировки</td></tr>
+        </table>
+        <div class="note">🔁 Подбирай вес так чтобы последние 2 повторения давались с усилием, но без нарушения техники.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">📅 Примерная неделя</div>
+        <div class="week-day">
+          <div class="day-badge train">ПН</div>
+          <div class="day-info"><div class="day-title">Тренировка 1 — Грудь + Бицепс</div><div class="day-desc">+ лёгкая спина + 1 упражнение присед</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge rest">ВТ</div>
+          <div class="day-info"><div class="day-title">Отдых / Йога</div><div class="day-desc">Растяжка, восстановление</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge train">СР</div>
+          <div class="day-info"><div class="day-title">Тренировка 2 — Спина + Плечи</div><div class="day-desc">+ лёгкая грудь (1 упр. жим гантелей)</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge rest">ЧТ</div>
+          <div class="day-info"><div class="day-title">Отдых / Йога</div><div class="day-desc">Растяжка, восстановление</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge train">ПТ</div>
+          <div class="day-info"><div class="day-title">Тренировка 3 — Ноги + Трицепс</div><div class="day-desc">+ лёгкие плечи (боковые подъёмы 2–3 подхода)</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge yoga">СБ</div>
+          <div class="day-info"><div class="day-title">Йога / Кардио</div><div class="day-desc">20–25 мин быстрая ходьба / вело</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge rest">ВС</div>
+          <div class="day-info"><div class="day-title">Полный отдых</div><div class="day-desc">Восстановление, сон</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТРЕНИРОВКА 1 -->
+    <div class="pane" id="p-t1">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">💪 Тренировка 1 — Грудь + Бицепс <span style="font-weight:400;color:var(--muted)">(~65–70 мин)</span></div>
+        <div class="note">🔥 Разминка: скакалка 3 мин или лёгкое кардио</div>
+        <div style="height:8px;"></div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Жим штанги лёжа</span><span class="tag-base">БАЗА</span><div class="ex-note">Силовой день: 4×3–5 / Обычный: 4×8–10</div></td><td><span class="ex-sets">4×8–10</span></td></tr>
+          <tr><td><span class="ex-name">Жим гантелей на наклонной</span><div class="ex-note">30° угол, контролируй негатив</div></td><td><span class="ex-sets">4×10–12</span></td></tr>
+          <tr><td><span class="ex-name">Сведение рук (кабель/тренажёр)</span><div class="ex-note">Пиковое сокращение в конце</div></td><td><span class="ex-sets">3×12–15</span></td></tr>
+          <tr><td><span class="ex-name">Разводка гантелей лёжа</span></td><td><span class="ex-sets">3×12–15</span></td></tr>
+          <tr style="background:var(--blue-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--blue);font-weight:700;">— ЛЁГКАЯ СПИНА —</td></tr>
+          <tr><td><span class="ex-name">Тяга горизонтального блока</span><span class="tag-light">ЛЁГКАЯ</span><div class="ex-note">2–3 подхода, вес лёгкий — кровоток и растяжка</div></td><td><span class="ex-sets" style="color:var(--blue);">2–3×12</span></td></tr>
+          <tr style="background:var(--blue-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--blue);font-weight:700;">— БИЦЕПС —</td></tr>
+          <tr><td><span class="ex-name">Подъём штанги на бицепс</span><div class="ex-note">Не раскачивай корпус</div></td><td><span class="ex-sets">4×10–12</span></td></tr>
+          <tr><td><span class="ex-name">Молотки с гантелями</span><div class="ex-note">Нейтральный хват, плечо статично</div></td><td><span class="ex-sets">3×12–15</span></td></tr>
+          <tr><td><span class="ex-name">Сгибание на блоке обратным хватом</span><div class="ex-note">Плечевая мышца под бицепсом</div></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr style="background:var(--blue-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--blue);font-weight:700;">— ЛЁГКИЕ НОГИ —</td></tr>
+          <tr><td><span class="ex-name">Приседания</span><span class="tag-light">1 УПР.</span></td><td><span class="ex-sets" style="color:var(--blue);">2–3×12</span></td></tr>
+          <tr style="background:var(--green-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--green);font-weight:700;">— ПРЕСС —</td></tr>
+          <tr><td><span class="ex-name">Классика / подъём ног</span></td><td><span class="ex-sets" style="color:var(--green);">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Поясница / гиперэкстензия</span></td><td><span class="ex-sets" style="color:var(--green);">3×15</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ТРЕНИРОВКА 2 -->
+    <div class="pane" id="p-t2">
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">🔙 Тренировка 2 — Спина + Плечи <span style="font-weight:400;color:var(--muted)">(~65–70 мин)</span></div>
+        <div class="note">🔥 Разминка: скакалка 2 мин или кардио</div>
+        <div style="height:8px;"></div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Подтягивания широким хватом</span><span class="tag-base">БАЗА</span><div class="ex-note">До отказа / с отягощением если легко</div></td><td><span class="ex-sets">3–4×макс</span></td></tr>
+          <tr><td><span class="ex-name">Тяга штанги в наклоне / тяга параллельно</span><div class="ex-note">Силовой день: 3×5 / Обычный: 3×8–10</div></td><td><span class="ex-sets">3×8–10</span></td></tr>
+          <tr><td><span class="ex-name">Становая тяга</span><span class="tag-base">БАЗА</span><div class="ex-note">Раз в 2 недели. Следи за спиной!</div></td><td><span class="ex-sets">3×8</span></td></tr>
+          <tr><td><span class="ex-name">Горизонтальная тяга блока</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Гиперэкстензия</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr style="background:var(--amber-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--amber);font-weight:700;">— ПЛЕЧИ —</td></tr>
+          <tr><td><span class="ex-name">Жим штанги / гантелей вверх</span><span class="tag-base">БАЗА</span></td><td><span class="ex-sets">4×10–12</span></td></tr>
+          <tr><td><span class="ex-name">Махи в стороны</span><div class="ex-note">Локоть чуть выше кисти, контроль</div></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Обратные разведения / бабочка в наклоне</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Трапеции (шраги со штангой)</span></td><td><span class="ex-sets">4×20</span></td></tr>
+          <tr style="background:var(--red-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--red);font-weight:700;">— ЛЁГКАЯ ГРУДЬ —</td></tr>
+          <tr><td><span class="ex-name">Жим гантелей лёжа</span><span class="tag-light">1 УПР.</span></td><td><span class="ex-sets" style="color:var(--blue);">2–3×12</span></td></tr>
+          <tr style="background:var(--green-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--green);font-weight:700;">— ПРЕСС —</td></tr>
+          <tr><td><span class="ex-name">Скручивания на блоке</span></td><td><span class="ex-sets" style="color:var(--green);">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Поясница</span></td><td><span class="ex-sets" style="color:var(--green);">3×15</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ТРЕНИРОВКА 3 -->
+    <div class="pane" id="p-t3">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🦵 Тренировка 3 — Ноги + Трицепс <span style="font-weight:400;color:var(--muted)">(~65–70 мин)</span></div>
+        <div class="note">🔥 Разминка: скакалка 3 мин</div>
+        <div style="height:8px;"></div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Приседания со штангой</span><span class="tag-base">БАЗА</span><div class="ex-note">Силовой день: 3×3–5 / Обычный: 4×8–10</div></td><td><span class="ex-sets">4×8–10</span></td></tr>
+          <tr><td><span class="ex-name">Жим ногами</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Разгибания ног в тренажёре</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Сгибания ног лёжа</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Выпады с гантелями</span></td><td><span class="ex-sets">3×10</span></td></tr>
+          <tr><td><span class="ex-name">Подъёмы на икры</span></td><td><span class="ex-sets">4×20</span></td></tr>
+          <tr style="background:var(--purple-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--purple);font-weight:700;">— ТРИЦЕПС —</td></tr>
+          <tr><td><span class="ex-name">Жим штанги узким хватом</span><div class="ex-note">3×5–6 для силы (начало трицепса)</div></td><td><span class="ex-sets">3×8–10</span></td></tr>
+          <tr><td><span class="ex-name">Разгибания на блоке</span></td><td><span class="ex-sets">4×12–15</span></td></tr>
+          <tr><td><span class="ex-name">Французский жим / из-за головы</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Разгибание на блоке одной рукой</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr style="background:var(--amber-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--amber);font-weight:700;">— ЛЁГКИЕ ПЛЕЧИ —</td></tr>
+          <tr><td><span class="ex-name">Боковые подъёмы</span><span class="tag-light">2–3 ПОДХ.</span></td><td><span class="ex-sets" style="color:var(--blue);">2–3×15</span></td></tr>
+          <tr style="background:var(--green-bg)!important;"><td colspan="2" style="padding:4px 8px;font-size:10px;color:var(--green);font-weight:700;">— ПРЕСС —</td></tr>
+          <tr><td><span class="ex-name">Классика / подъём ног</span></td><td><span class="ex-sets" style="color:var(--green);">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Трапеции штанга за спиной</span></td><td><span class="ex-sets">4×20</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ БЛОК 2: ПРЕСС И ЙОГА ═══ -->
+<div class="section" id="g-press" data-group="press">
+  <div class="section-hdr" onclick="toggleSection('g-press')">
+    <span class="section-icon">🏋️</span>
+    <span class="section-title">Пресс и йога</span>
+    <span class="section-count">Ab-ролик · Утро · Вечер</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-press','p-press',this)">🎯 Пресс</button>
+      <button class="pill-btn" onclick="showPane('g-press','p-yoga-m',this)">🌅 Утренняя йога</button>
+      <button class="pill-btn" onclick="showPane('g-press','p-yoga-w',this)">🌙 Недельный план</button>
+    </div>
+
+    <div class="pane active" id="p-press">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔥 10-минутная схема пресса</div>
+        <div class="circuit-item"><div class="circuit-num">1</div><div class="circuit-name">Подъём ног</div><div class="circuit-sets">15 повт.</div></div>
+        <div class="circuit-item"><div class="circuit-num">2</div><div class="circuit-name">Скручивания на блоке</div><div class="circuit-sets">12–15 повт.</div></div>
+        <div class="circuit-item"><div class="circuit-num">3</div><div class="circuit-name">Планка</div><div class="circuit-sets">45 сек</div></div>
+        <div class="circuit-item"><div class="circuit-num">4</div><div class="circuit-name">Ab-ролик</div><div class="circuit-sets">8–12 повт.</div></div>
+        <div class="info">🔁 3–4 круга ≈ 10–11 минут</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--purple);">
+        <div class="card-title">⭐ Ab-ролик — мощное упражнение</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">💡</span>Пресс сильно растягивается, затем мощно сокращается — кубики становятся объёмнее</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Встань на колени, ролик под плечами</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Медленно катись вперёд, корпус прямой</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Не прогибай поясницу</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Возвращайся за счёт пресса</li>
+        </ul>
+        <div class="warn">❌ Главная ошибка — провал в пояснице</div>
+        <div class="formula" style="font-size:12px;padding:10px;margin-top:10px;">3 подхода × 8–12 повт. · Отдых 30–40 сек</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">💡 Маленький секрет рельефа</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🌬️</span><strong>Вакуум утром</strong> — 4–5 подходов по 20 сек. Втяни живот на выдохе, держи.</li>
+          <li class="rule-item"><span class="rule-icon">🚶</span><strong>Кардио 1 раз в неделю</strong> — 20–25 мин быстрая ходьба / дорожка / вело. Снижает жир на животе.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-yoga-m">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🌅 Утренний комплекс — 10 минут</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green);">2м</div><div class="step-text"><strong>Кошка–корова</strong> — 8–10 циклов на четвереньках. Вдох — прогиб, выдох — округление. Разогревает позвоночник.</div></li>
+          <li class="step"><div class="step-num" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green);">3м</div><div class="step-text"><strong>Собака мордой вниз</strong> — 1 мин, поочерёдно сгибай колени. <strong>Планка</strong> — 30–40 сек. <strong>Кобра</strong> — 30 сек, грудь раскрыта.</div></li>
+          <li class="step"><div class="step-num" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green);">3м</div><div class="step-text"><strong>Сурья Намаскар</strong> (Приветствие солнцу) — 2–3 медленных круга в ритме дыхания. Включает всё тело.</div></li>
+          <li class="step"><div class="step-num" style="background:var(--green-bg);border-color:var(--green-border);color:var(--green);">2м</div><div class="step-text"><strong>Наклон вперёд стоя</strong> — 40 сек (колени можно согнуть). <strong>Поза ребёнка</strong> — 1–1.5 мин, дыхание глубокое.</div></li>
+        </ul>
+        <div class="info">⏱️ Если 5 минут: Кошка-корова 1 мин → Собака вниз 1 мин → 1 круг Сурья Намаскар → Наклон + поза ребёнка</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">✅ Зачем йога если ходишь в зал?</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🦴</span>Улучшает подвижность суставов и гибкость — меньше зажимов после силовых</li>
+          <li class="rule-item"><span class="rule-icon">⚡</span>Помогает восстановлению и снижает риск травм</li>
+          <li class="rule-item"><span class="rule-icon">🧘</span>Улучшает осанку и дыхание</li>
+          <li class="rule-item"><span class="rule-icon">🧠</span>Снижает стресс, улучшает концентрацию</li>
+        </ul>
+        <div class="success">Оптимально: 2–3 раза в неделю по 20–30 мин после зала или в дни отдыха</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-yoga-w">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">📅 Неделя йоги под зал</div>
+        <div class="week-day">
+          <div class="day-badge yoga" style="font-size:10px;">ДЕНЬ 1</div>
+          <div class="day-info"><div class="day-title">Мобильность + спина (20–25 мин)</div><div class="day-desc">Кошка-корова 2 мин · Собака вниз 3×30 сек · Выпад с раскрытием таза 2×30 сек · Поза ребёнка 2 мин · Скрутка лёжа 1 мин</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge rest" style="font-size:10px;">ДЕНЬ 3</div>
+          <div class="day-info"><div class="day-title">Восстановление ног (20 мин)</div><div class="day-desc">Наклон вперёд сидя 2×30 сек · Голубь 1 мин · Бабочка 2 мин · Ноги у стены 3–5 мин</div></div>
+        </div>
+        <div class="week-day">
+          <div class="day-badge yoga" style="font-size:10px;">ДЕНЬ 5</div>
+          <div class="day-info"><div class="day-title">Короткая утренняя (10–15 мин)</div><div class="day-desc">3 круга Сурья Намаскар · Планка 30–40 сек · Собака вниз 1 мин · Шавасана 2 мин</div></div>
+        </div>
+      </div>
+      <div class="note">⚠️ Йога не должна быть больно. Тянущее — ок, резкое — стоп. Лучше 15 мин регулярно, чем час раз в месяц.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ БЛОК 3: ДРУГИЕ ПРОГРАММЫ ═══ -->
+<div class="section" id="g-other" data-group="other">
+  <div class="section-hdr" onclick="toggleSection('g-other')">
+    <span class="section-icon">📋</span>
+    <span class="section-title">Другие программы</span>
+    <span class="section-count">Арнольд · Дядя Саня · Ганнибал</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-other','p-arnold',this)">🏆 От Арнольда</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-uncle',this)">💪 Дядя Саня</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-hannibal',this)">🔥 Ганнибал</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-legenkova',this)">⚡ Суперсеты</button>
+    </div>
+
+    <div class="pane active" id="p-arnold">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔴 Т1 — Грудь + Бицепс</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Жим штанги лёжа</span></td><td><span class="ex-sets">4×10</span></td></tr>
+          <tr><td><span class="ex-name">Жим под наклоном</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Сведение бабочка</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Подъём штанги на бицепс</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Молотки с гантелями</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Кросс снизу по одной руке</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Пресс / лягушка</span></td><td><span class="ex-sets">4×15</span></td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">🔴 Т2 — Спина + Плечи</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Тяга параллельно</span></td><td><span class="ex-sets">3×10</span></td></tr>
+          <tr><td><span class="ex-name">Подтягивания широким хватом</span></td><td><span class="ex-sets">3×отказ</span></td></tr>
+          <tr><td><span class="ex-name">Становая тяга</span></td><td><span class="ex-sets">3×10</span></td></tr>
+          <tr><td><span class="ex-name">Гиперэкстензия</span></td><td><span class="ex-sets">3×10</span></td></tr>
+          <tr><td><span class="ex-name">Жим вверх / гриф вверх</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Махи в стороны</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Обратная бабочка</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Трапеции со штангой (40 кг)</span></td><td><span class="ex-sets">4×20</span></td></tr>
+          <tr><td><span class="ex-name">Пресс / поясница</span></td><td><span class="ex-sets">4×15</span></td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🔴 Т3 — Трицепс + Ноги</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Жим лёжа (силовой разогрев)</span></td><td><span class="ex-sets">3×5 (70кг)</span></td></tr>
+          <tr><td><span class="ex-name">Трицепс на блоке</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Разгибание из-за головы</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Разгибание одной рукой</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Приседания</span></td><td><span class="ex-sets">4×10</span></td></tr>
+          <tr><td><span class="ex-name">Разгибания ног</span></td><td><span class="ex-sets">4×10</span></td></tr>
+          <tr><td><span class="ex-name">Выпады с гантелями</span></td><td><span class="ex-sets">3×10</span></td></tr>
+          <tr><td><span class="ex-name">Сгибания ног</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Икры</span></td><td><span class="ex-sets">3×20</span></td></tr>
+          <tr><td><span class="ex-name">Трапеции за спиной + шея</span></td><td><span class="ex-sets">4×20</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-uncle">
+      <div class="info" style="margin-bottom:10px;">⏱️ Отдых между подходами 60 сек, между упражнениями 2–3 мин</div>
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">💪 День 1 — Грудь + Трицепс</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Жим на наклонной</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Бабочка</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Жим гантелей на наклонной</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Брусья</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Трицепс на блоке</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Разгибания гантели из-за головы одной рукой</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Сгибания ног</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Приседания</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Жим ногами</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Выпады</span></td><td><span class="ex-sets">3×20</span></td></tr>
+          <tr><td><span class="ex-name">Разгибания ног</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Мёртвая тяга</span></td><td><span class="ex-sets">3×12</span></td></tr>
+          <tr><td><span class="ex-name">Икры</span></td><td><span class="ex-sets">4×25</span></td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">💪 День 2 — Спина</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Подтягивания широким хватом</span></td><td><span class="ex-sets">4×отказ</span></td></tr>
+          <tr><td><span class="ex-name">Вертикальная тяга параллельно</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Тяга штанги в наклоне</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Горизонтальная тяга</span></td><td><span class="ex-sets">3×15</span></td></tr>
+          <tr><td><span class="ex-name">Становая тяга</span></td><td><span class="ex-sets">3×8</span></td></tr>
+          <tr><td><span class="ex-name">Махи в наклоне</span></td><td><span class="ex-sets">4×15</span></td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">💪 День 3 — Плечи + Бицепс</div>
+        <table class="ex-table">
+          <tr><th>Упражнение</th><th>Подх.×Повт.</th></tr>
+          <tr><td><span class="ex-name">Махи в стороны</span></td><td><span class="ex-sets">5×20</span></td></tr>
+          <tr><td><span class="ex-name">Жим штанги сидя</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Протяжка</span></td><td><span class="ex-sets">3×20</span></td></tr>
+          <tr><td><span class="ex-name">Жим гантелей сидя</span></td><td><span class="ex-sets">4×15</span></td></tr>
+          <tr><td><span class="ex-name">Сгибания рук со штангой</span></td><td><span class="ex-sets">4×12</span></td></tr>
+          <tr><td><span class="ex-name">Молоток</span></td><td><span class="ex-sets">4×15</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-hannibal">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔥 Тренировка Ганнибала — 45 минут</div>
+        <div class="warn">⏱️ Уложиться в 45 минут. Перерыв между кругами — 2 минуты.</div>
+        <div style="height:8px;"></div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-val red">275</div><div class="stat-lbl">Отжиманий</div></div>
+          <div class="stat-box"><div class="stat-val red">70</div><div class="stat-lbl">Подтягиваний</div></div>
+          <div class="stat-box"><div class="stat-val red">165</div><div class="stat-lbl">Брусья</div></div>
+          <div class="stat-box"><div class="stat-val red">70</div><div class="stat-lbl">Подт. обр. хват</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="card-title" style="font-size:12px;">Сет 1 — убывающие повторения</div>
+        <table class="tbl">
+          <tr><th>Упражнение</th><th>Круги</th></tr>
+          <tr><td>Отжимания (прямой хват)</td><td>25 / 24 / 23 / 22 / 21</td></tr>
+          <tr><td>Подтягивания (прямой хват)</td><td>10 / 9 / 8 / 7 / 6</td></tr>
+          <tr><td>Отжимания на брусьях</td><td>15 / 14 / 13 / 12 / 11</td></tr>
+          <tr><td>Подтягивания (обратный хват)</td><td>8 / 7 / 6 / 5 / 5</td></tr>
+        </table>
+        <div class="divider"></div>
+        <div class="card-title" style="font-size:12px;">Сет 2 — по 3 подхода</div>
+        <table class="tbl">
+          <tr><th>Упражнение</th><th>Подходы</th></tr>
+          <tr><td>Приседания</td><td>20 / 20 / 20</td></tr>
+          <tr><td>Выпады</td><td>10 шагов / 10 / 10</td></tr>
+          <tr><td>Эспандер — грудь</td><td>15 / 15 / 15</td></tr>
+          <tr><td>Эспандер — спина</td><td>10 / 10 / 10</td></tr>
+          <tr><td>Пресс</td><td>10 / 10 / 10</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-legenkova">
+      <div class="info" style="margin-bottom:10px;">⚡ Суперсеты — два упражнения без отдыха между ними. 4 подхода каждый суперсет.</div>
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">Понедельник — Ноги + Грудь + Руки</div>
+        <div class="superset"><div class="superset-label">Суперсет 1</div><div class="superset-item"><div class="superset-name">Выпады диагональные с гантелями</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Жим штанги лёжа</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 2</div><div class="superset-item"><div class="superset-name">Подъём на куб с выпадом назад</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Жим гантелей 30°</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 3</div><div class="superset-item"><div class="superset-name">Махи в кроссовере</div><div class="superset-sets">15 повт.</div></div><div class="superset-item"><div class="superset-name">Брусья</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 4</div><div class="superset-item"><div class="superset-name">Разведение ног</div><div class="superset-sets">25</div></div><div class="superset-item"><div class="superset-name">Крабик</div><div class="superset-sets">40</div></div><div class="superset-item"><div class="superset-name">Бабочка (грудь)</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 5</div><div class="superset-item"><div class="superset-name">Обратные отжимания</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Молотки</div><div class="superset-sets">12 повт.</div></div></div>
+      </div>
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">Среда — Спина + Плечи</div>
+        <div class="superset"><div class="superset-label">Суперсет 1</div><div class="superset-item"><div class="superset-name">Становая тяга</div><div class="superset-sets">10 повт.</div></div><div class="superset-item"><div class="superset-name">Жим штанги стоя</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 2</div><div class="superset-item"><div class="superset-name">Подтягивания</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Жим Арнольда сидя</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 3</div><div class="superset-item"><div class="superset-name">Тяга гантели к поясу</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Жим в хаммере (плечи)</div><div class="superset-sets">15 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 4</div><div class="superset-item"><div class="superset-name">Горизонтальная тяга</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Протяжка гири</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Обратная бабочка</div><div class="superset-sets">15 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 5</div><div class="superset-item"><div class="superset-name">Вертикальная тяга</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Махи стоя через стороны</div><div class="superset-sets">20 повт.</div></div></div>
+      </div>
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">Пятница — Ноги + Грудь + Трицепс</div>
+        <div class="superset"><div class="superset-label">Суперсет 1</div><div class="superset-item"><div class="superset-name">Присед база</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Жим штанги наклон</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 2</div><div class="superset-item"><div class="superset-name">Жим ногами</div><div class="superset-sets">25 повт.</div></div><div class="superset-item"><div class="superset-name">Жим гантелями на прямой</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 3</div><div class="superset-item"><div class="superset-name">Присед Смита узко</div><div class="superset-sets">15 повт.</div></div><div class="superset-item"><div class="superset-name">Разгибание ног</div><div class="superset-sets">15 повт.</div></div><div class="superset-item"><div class="superset-name">Разводка 30°</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 4</div><div class="superset-item"><div class="superset-name">Сведение ног</div><div class="superset-sets">20 повт.</div></div><div class="superset-item"><div class="superset-name">Прыжок вверх</div><div class="superset-sets">12 повт.</div></div><div class="superset-item"><div class="superset-name">Бабочка</div><div class="superset-sets">12 повт.</div></div></div>
+        <div class="superset"><div class="superset-label">Суперсет 5</div><div class="superset-item"><div class="superset-name">Разгибание верхнего блока</div><div class="superset-sets">15 повт.</div></div><div class="superset-item"><div class="superset-name">Пуловер лёжа с гантелью</div><div class="superset-sets">12 повт.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ БЛОК 4: ПИТАНИЕ ═══ -->
+<div class="section" id="g-food" data-group="food">
+  <div class="section-hdr" onclick="toggleSection('g-food')">
+    <span class="section-icon">🥗</span>
+    <span class="section-title">Питание для роста мышц</span>
+    <span class="section-count">КБЖУ · Меню · Продукты</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-food','p-kbju',this)">📊 КБЖУ</button>
+      <button class="pill-btn" onclick="showPane('g-food','p-menu',this)">🍽️ Меню на день</button>
+      <button class="pill-btn" onclick="showPane('g-food','p-products',this)">🛒 Продукты</button>
+      <button class="pill-btn" onclick="showPane('g-food','p-timing',this)">⏰ Тайминг</button>
+    </div>
+
+    <div class="pane active" id="p-kbju">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📊 Твои цифры (67 кг · 170 см)</div>
+        <div class="stat-grid">
+          <div class="stat-box"><div class="stat-val red">2600–2800</div><div class="stat-lbl">Ккал/день (профицит +300)</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--blue);">134–145г</div><div class="stat-lbl">Белок (2–2.2г × кг)</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--amber);">268–335г</div><div class="stat-lbl">Углеводы (4–5г × кг)</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--green);">54–80г</div><div class="stat-lbl">Жиры (0.8–1.2г × кг)</div></div>
+        </div>
+        <div class="info">💡 Оптимальный темп набора — 0.3–0.7 кг в неделю. Быстрее = больше жира.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">📐 Соотношение БЖУ</div>
+        <div class="formula formula-red" style="font-size:12px;padding:10px;">Белки 30% · Жиры 20% · Углеводы 50%</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🥩</span><strong>Белок</strong> — 1.6–2.2 г на кг. Главный строительный материал мышц.</li>
+          <li class="rule-item"><span class="rule-icon">🍚</span><strong>Углеводы</strong> — 4–5 г на кг. Основной источник энергии для тренировок.</li>
+          <li class="rule-item"><span class="rule-icon">🥑</span><strong>Жиры</strong> — 0.8–1.2 г на кг. Участвуют в гормональном фоне и восстановлении.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">⚠️ Частые ошибки в питании</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">❌</span>Недостаток калорий — мышцы не могут расти без профицита</li>
+          <li class="rule-item"><span class="rule-icon">❌</span>Переедание — лишний жир вместо мышц</li>
+          <li class="rule-item"><span class="rule-icon">❌</span>Мало белка — много каш, мало пользы</li>
+          <li class="rule-item"><span class="rule-icon">❌</span>Сникерс после тренировки — жиры съедают место для белка и углеводов</li>
+          <li class="rule-item"><span class="rule-icon">❌</span>Пропуск приёмов пищи — организм расщепляет мышцы</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-menu">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🍽️ Меню на день (тренировочный)</div>
+        <div class="food-time">Завтрак 7:00–8:00</div>
+        <div class="food-item"><span>Овсянка с бананом и орехами</span><span class="food-g">200г</span></div>
+        <div class="food-item"><span>Яичница / омлет</span><span class="food-g">3–4 яйца</span></div>
+        <div class="divider"></div>
+        <div class="food-time">Перекус 10:30–11:00</div>
+        <div class="food-item"><span>Творог</span><span class="food-g">200г</span></div>
+        <div class="food-item"><span>Фрукты (яблоко / банан)</span><span class="food-g">1 шт</span></div>
+        <div class="divider"></div>
+        <div class="food-time">Обед 13:00–14:00</div>
+        <div class="food-item"><span>Гречка / рис</span><span class="food-g">150г сух.</span></div>
+        <div class="food-item"><span>Куриная грудка / говядина</span><span class="food-g">200г</span></div>
+        <div class="food-item"><span>Овощи / салат</span><span class="food-g">150г</span></div>
+        <div class="divider"></div>
+        <div class="food-time">До тренировки (за 1.5–2 часа)</div>
+        <div class="food-item"><span>Рис / гречка</span><span class="food-g">100г</span></div>
+        <div class="food-item"><span>Куриная грудка / яйца</span><span class="food-g">150г</span></div>
+        <div class="divider"></div>
+        <div class="food-time">После тренировки (в течение часа)</div>
+        <div class="food-item"><span>Рис / картофель</span><span class="food-g">150г</span></div>
+        <div class="food-item"><span>Рыба / курица</span><span class="food-g">200г</span></div>
+        <div class="food-item"><span>Протеиновый коктейль (опционально)</span><span class="food-g">30г белка</span></div>
+        <div class="divider"></div>
+        <div class="food-time">Ужин 20:00–21:00</div>
+        <div class="food-item"><span>Творог с орехами / мясо с овощами</span><span class="food-g">200г творога</span></div>
+        <div class="info" style="margin-top:8px;">🌙 Перед сном: творог / казеиновый протеин — ночью активен гормон роста, нужен белок для восстановления.</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-products">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:var(--blue);">
+          <div class="card-title">🥩 Белок</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🐔</span>Куриная грудка</li>
+            <li class="rule-item"><span class="rule-icon">🐟</span>Рыба (лосось, треска, тунец)</li>
+            <li class="rule-item"><span class="rule-icon">🥚</span>Яйца (целые + белки)</li>
+            <li class="rule-item"><span class="rule-icon">🧀</span>Творог (казеин — медленный белок)</li>
+            <li class="rule-item"><span class="rule-icon">🥛</span>Греческий йогурт</li>
+            <li class="rule-item"><span class="rule-icon">🥩</span>Говядина / индейка</li>
+            <li class="rule-item"><span class="rule-icon">🫘</span>Бобовые (чечевица, нут)</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:var(--amber);">
+          <div class="card-title">🍚 Углеводы</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🍚</span>Рис (белый / бурый)</li>
+            <li class="rule-item"><span class="rule-icon">🌾</span>Гречка</li>
+            <li class="rule-item"><span class="rule-icon">🌾</span>Овсянка</li>
+            <li class="rule-item"><span class="rule-icon">🍝</span>Макароны из твёрдых сортов</li>
+            <li class="rule-item"><span class="rule-icon">🥔</span>Картофель</li>
+            <li class="rule-item"><span class="rule-icon">🍌</span>Фрукты (банан, яблоко)</li>
+            <li class="rule-item"><span class="rule-icon">🍞</span>Цельнозерновой хлеб</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:var(--green);">
+          <div class="card-title">🥑 Жиры</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🥑</span>Авокадо</li>
+            <li class="rule-item"><span class="rule-icon">🥜</span>Орехи (миндаль, грецкий)</li>
+            <li class="rule-item"><span class="rule-icon">🫒</span>Оливковое масло</li>
+            <li class="rule-item"><span class="rule-icon">🐟</span>Рыбий жир / омега-3</li>
+            <li class="rule-item"><span class="rule-icon">🌰</span>Арахисовая паста</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:var(--purple);">
+          <div class="card-title">💊 Добавки (не обязательно)</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🥛</span>Протеин — удобный источник белка</li>
+            <li class="rule-item"><span class="rule-icon">⚡</span>Креатин — +сила и объём мышц</li>
+            <li class="rule-item"><span class="rule-icon">🌿</span>Витаминно-минеральный комплекс</li>
+            <li class="rule-item"><span class="rule-icon">🐟</span>Омега-3 — суставы и восстановление</li>
+          </ul>
+          <div class="note">Гейнер — только если совсем не берёшь вес. При 67 кг протеин важнее гейнера.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-timing">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⏰ Режим питания</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🍽️</span><strong>4–6 приёмов пищи в день</strong> — мышцы постоянно получают подпитку</li>
+          <li class="rule-item"><span class="rule-icon">💪</span><strong>До тренировки (за 1.5–2 ч)</strong> — белки + сложные углеводы, лёгкая порция</li>
+          <li class="rule-item"><span class="rule-icon">⚡</span><strong>После тренировки (до 1 ч)</strong> — углеводы + белок, важнейший приём</li>
+          <li class="rule-item"><span class="rule-icon">🌙</span><strong>Перед сном</strong> — казеиновый белок (творог), ночью идёт восстановление</li>
+          <li class="rule-item"><span class="rule-icon">💧</span><strong>Вода</strong> — 2–3 литра в день. Мышцы на 70% из воды!</li>
+        </ul>
+      </div>
+      <div class="success">✅ Правило: не пропускай ужин — ночью активно восстанавливаются мышцы.</div>
+      <div class="warn">❌ Не ешь «Сникерс» после тренировки — жиры займут место для нужных углеводов и белка.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ БЛОК 5: ВОССТАНОВЛЕНИЕ И РЕЖИМ ═══ -->
+<div class="section" id="g-recovery" data-group="recovery">
+  <div class="section-hdr" onclick="toggleSection('g-recovery')">
+    <span class="section-icon">😴</span>
+    <span class="section-title">Восстановление и режим</span>
+    <span class="section-count">Сон · Советы · Ошибки</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="pane active" id="p-recovery">
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">😴 Сон — главное восстановление</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🕐</span><strong>7–9 часов</strong> — обязательный минимум. Мышцы растут во сне, не во время тренировки!</li>
+          <li class="rule-item"><span class="rule-icon">🌙</span>Во сне активен гормон роста — именно он строит мышечную ткань</li>
+          <li class="rule-item"><span class="rule-icon">📵</span>Без телефона за 30 мин до сна — качество сна выше</li>
+          <li class="rule-item"><span class="rule-icon">🌡️</span>Прохладная комната (+18–20°C) — глубже спишь</li>
+        </ul>
+        <div class="warn">⚠️ Без полноценного сна — нет прогресса, даже при идеальных тренировках и питании.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">⚡ Принцип суперкомпенсации</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">💪</span>Тренировка разрушает мышечные волокна</li>
+          <li class="rule-item"><span class="rule-icon">😴</span>Восстановление — мышца отстраивается чуть выше исходного уровня</li>
+          <li class="rule-item"><span class="rule-icon">📈</span>Это и есть рост мышц — суперкомпенсация</li>
+          <li class="rule-item"><span class="rule-icon">⚠️</span>Если мало отдыха — вместо роста идёт истощение</li>
+        </ul>
+        <div class="formula" style="font-size:12px;padding:10px;">Тренировка → Разрушение → Отдых → Рост → Следующая тренировка</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">🗓️ Стадии прогресса</div>
+        <table class="tbl">
+          <tr><th>Период</th><th>Результат</th></tr>
+          <tr><td>1–3 месяца</td><td>Быстрый прогресс — нейромышечная адаптация</td></tr>
+          <tr><td>3–12 месяцев</td><td>Стабильный прирост 0.5–1 кг мышц в месяц</td></tr>
+          <tr><td>1–3 года</td><td>Замедление — нужно усложнять программу</td></tr>
+        </table>
+        <div class="info">💡 Реальный набор мышц: 0.5–1 кг в месяц при правильном питании и тренировках. Больше — уже жир.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--purple);">
+        <div class="card-title">🛠️ Помощь восстановлению</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🧘</span>Йога и растяжка после тренировки — меньше зажимов и травм</li>
+          <li class="rule-item"><span class="rule-icon">🚿</span>Контрастный душ — ускоряет восстановление</li>
+          <li class="rule-item"><span class="rule-icon">🏊</span>Сауна — 1–2 раза в месяц расслабляет мышцы</li>
+          <li class="rule-item"><span class="rule-icon">🧴</span>Массаж — 1–2 раза в месяц если есть возможность</li>
+          <li class="rule-item"><span class="rule-icon">💧</span>Вода — 2–3 л в день минимум</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📌 Ключевые правила — запомни</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">✅</span>Прогрессируй нагрузку — добавляй вес или повторения каждые 1–2 недели</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Взвешивайся — прибавка 0.3–0.7 кг в неделю = хорошо</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Если растёт только живот — уменьши профицит калорий</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Техника важнее веса — лучше меньше, но правильно</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Регулярность — лучше 3 раза в неделю стабильно, чем 5 раз и бросить</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<nav class="bnav">
+  <button class="bnav-btn active" id="nav-all" onclick="filterGroup('all',this)"><span class="bnav-icon">🏠</span>Все</button>
+  <button class="bnav-btn" id="nav-program" onclick="filterGroup('program',this)"><span class="bnav-icon">💪</span>Программа</button>
+  <button class="bnav-btn" id="nav-press" onclick="filterGroup('press',this)"><span class="bnav-icon">🏋️</span>Пресс</button>
+  <button class="bnav-btn" id="nav-other" onclick="filterGroup('other',this)"><span class="bnav-icon">📋</span>Другие</button>
+  <button class="bnav-btn" id="nav-food" onclick="filterGroup('food',this)"><span class="bnav-icon">🥗</span>Питание</button>
+  <button class="bnav-btn" id="nav-recovery" onclick="filterGroup('recovery',this)"><span class="bnav-icon">😴</span>Режим</button>
+</nav>
+
+<script>
+function toggleSection(id){const s=document.getElementById(id);s.classList.toggle('open');}
+function showPane(gId,pId,btn){const g=document.getElementById(gId);g.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));g.querySelectorAll('.pill-btn').forEach(b=>b.classList.remove('active'));document.getElementById(pId).classList.add('active');btn.classList.add('active');}
+function filterGroup(group,btn){document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.section').forEach(s=>{s.style.display=group==='all'?'':s.dataset.group===group?'':'none';});if(group!=='all'){const t=document.querySelector(`.section[data-group="${group}"]`);if(t&&!t.classList.contains('open'))t.classList.add('open');}window.scrollTo({top:0,behavior:'smooth'});}
+function doSearch(q){if(!q.trim()){document.querySelectorAll('.section').forEach(s=>s.style.display='');return;}const ql=q.toLowerCase();document.querySelectorAll('.section').forEach(sec=>{if(sec.textContent.toLowerCase().includes(ql)){sec.style.display='';if(!sec.classList.contains('open'))sec.classList.add('open');}else{sec.style.display='none';}});}
+window.addEventListener('scroll',()=>{document.getElementById('scroll-top').classList.toggle('show',window.scrollY>300);});
+</script>
+</body>
+</html>
