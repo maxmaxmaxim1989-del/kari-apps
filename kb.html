@@ -1094,6 +1094,216 @@ body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 7: ЗАМЕНА ЛОБОВОГО СТЕКЛА -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-zamena" data-group="zamena">
+  <div class="section-hdr" onclick="toggleSection('g-zamena')">
+    <span class="section-icon">🔧</span>
+    <span class="section-title">Замена лобового стекла</span>
+    <span class="section-count">9 этапов · Материалы · Ошибки</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-zamena','p-z-algo',this)">📋 Алгоритм</button>
+      <button class="pill-btn" onclick="showPane('g-zamena','p-z-mat',this)">🧰 Материалы</button>
+      <button class="pill-btn" onclick="showPane('g-zamena','p-z-time',this)">⏱️ Полимеризация</button>
+      <button class="pill-btn" onclick="showPane('g-zamena','p-z-err',this)">⚠️ Ошибки</button>
+    </div>
+
+    <!-- АЛГОРИТМ -->
+    <div class="pane active" id="p-z-algo">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">ℹ️ Общая информация</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🔩</span>Стекло вклеивается полиуретановым клеем (PUR) и является конструктивным элементом кузова</li>
+          <li class="rule-item"><span class="rule-icon">⚠️</span>Неправильная замена нарушает геометрию кузова и снижает безопасность при ДТП</li>
+          <li class="rule-item"><span class="rule-icon">🌡️</span>Температура в помещении: минимум +5°C, оптимум +15…+25°C, влажность до 75%</li>
+        </ul>
+        <div class="warn">⚠️ Выезд до полной полимеризации клея — опасен! Соблюдай SDAT.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📋 Шпаргалка — 9 этапов</div>
+        <table class="tbl">
+          <tr><th>#</th><th>Этап</th><th>Ключевой момент</th></tr>
+          <tr><td>1</td><td>Подготовка авто</td><td>Скотч, демонтаж аксессуаров, снятие жабо</td></tr>
+          <tr><td>2</td><td>Демонтаж стекла</td><td>Нить/пила по клею, фен на сложных участках</td></tr>
+          <tr><td>3</td><td>Подготовка проёма</td><td>Оставить 1–2 мм клея, обезжирить, праймер кузова</td></tr>
+          <tr><td>4</td><td>Подготовка стекла</td><td>Обезжирить кайму, праймер стекла, выдержка</td></tr>
+          <tr><td>5</td><td>Нанесение клея</td><td>Треугольный валик, без разрывов, до 10 мин паузы</td></tr>
+          <tr><td>6</td><td>Установка</td><td>По меткам, без скольжения, прижать, зафиксировать</td></tr>
+          <tr><td>7</td><td>Сборка</td><td>Уплотнители, разъёмы, жабо, дворники</td></tr>
+          <tr><td>8</td><td>Ожидание</td><td>Соблюдать SDAT — минимум до выезда</td></tr>
+          <tr><td>9</td><td>Проверка</td><td>Вода, герметичность, электрика</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">1️⃣ Подготовка автомобиля</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Накрыть капот, приборную панель, стойки малярным скотчем и плёнкой</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Снять поводки дворников со шлицов вала (маркировать положение!)</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Снять жабо (пластиковая панель снизу) — клипсы, шурупы</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Отключить: разъём обогрева, датчик дождя, видеорегистратор, зеркало</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Снять внутренние уплотнители по периметру с салона</div></li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--orange);">
+        <div class="card-title">2️⃣ Демонтаж старого стекла</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Надрезать клей по всему периметру снаружи строительным ножом</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Натянуть стальную струну через отверстие в клее, пилящими движениями срезать шов</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Сложные участки (нижний край) — прогреть феном 30–60 сек</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Захватить присосками вдвоём, вытолкнуть наружу равномерным движением</div></li>
+        </ul>
+        <div class="info">💡 Альтернатива нити — пневмопила или осциллятор. Быстрее, но требует навыка — легко повредить ЛКП.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">3️⃣ Подготовка проёма кузова</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Осмотреть фланец на ржавчину, сколы, деформации</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Срезать остатки клея — <strong>оставить 1–2 мм</strong>, не срезать до металла!</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">При ржавчине: преобразователь → грунт → полностью высохнуть</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Обезжирить фланец изопропанолом, двигаться в одном направлении</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Нанести праймер для кузова, выдержка 5–30 мин</div></li>
+        </ul>
+        <div class="warn">⚠️ Металл без грунта — источник коррозии! Не зачищать до голого металла без необходимости.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">4️⃣ Подготовка нового стекла</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Не касаться руками чёрной каймы при распаковке</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Примерить насухо — проверить зазоры, нанести метки позиционирования</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Обезжирить чёрную кайму (клеевая сторона) безворсовой салфеткой</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Нанести праймер строго по чёрной кайме, выдержка 5–10 мин</div></li>
+        </ul>
+        <div class="info">💡 Некоторые системы (Sika Tack Move) не требуют праймера на стекло — читай инструкцию к клею!</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">5️⃣ Нанесение клея PUR</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Срезать наконечник под углом 45° — для треугольного валика (8–12 мм)</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Прогнать первые 3–5 см клея на выброс — проверить равномерность</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Нанести непрерывным треугольным валиком по всему периметру без остановок</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">На углах — замедлить, клея выходит больше</div></li>
+        </ul>
+        <div class="warn">⚠️ После нанесения клея — установить стекло не позднее 10 минут!</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">6️⃣ Установка стекла</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Закрепить присоски, поднять стекло вдвоём</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Ориентировать по меткам позиционирования</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Опустить точно на клей без скользящих движений</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Давить равномерно по периметру ладонями — 2–3 сек на каждый участок</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Зафиксировать скотчем по верхнему и боковым краям</div></li>
+        </ul>
+        <div class="warn">⚠️ Не двигать стекло после установки — смещение разрушает клеевой шов! Незначительная корректировка допустима только в первые 2–3 минуты.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">7️⃣ Финальная сборка и проверка</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">→</div><div class="step-text">Установить: уплотнители, разъёмы обогрева, датчик дождя, зеркало, жабо, поводки дворников</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Удалить скотч через 30–60 мин (после начала схватывания)</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Полить водой по периметру — проверить салон на течь</div></li>
+          <li class="step"><div class="step-num">→</div><div class="step-text">Проверить: обогрев стекла, датчик дождя, дворники</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- МАТЕРИАЛЫ -->
+    <div class="pane" id="p-z-mat">
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">🧪 Основные материалы</div>
+        <table class="tbl">
+          <tr><th>Материал</th><th>Назначение</th></tr>
+          <tr><td><strong>Полиуретановый клей (PUR)</strong></td><td>Основное крепление. Sika Tack, Dow Betaseal, Wurth</td></tr>
+          <tr><td><strong>Праймер для стекла</strong></td><td>Адгезия клея к чёрной кайме стекла</td></tr>
+          <tr><td><strong>Праймер для кузова</strong></td><td>Адгезия клея к металлу / старому клею</td></tr>
+          <tr><td><strong>Очиститель / обезжириватель</strong></td><td>Изопропанол или специальный состав</td></tr>
+          <tr><td><strong>Новое стекло OEM/OEE</strong></td><td>Убедиться в наличии чёрной каймы</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🔧 Инструменты</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🔫</span>Пистолет для клея (пневматический / ручной)</li>
+          <li class="rule-item"><span class="rule-icon">🪡</span>Нить / стальная струна для вырезки стекла</li>
+          <li class="rule-item"><span class="rule-icon">🪛</span>Ручки-присоски (2–4 шт.)</li>
+          <li class="rule-item"><span class="rule-icon">🔪</span>Строительный нож / скальпель</li>
+          <li class="rule-item"><span class="rule-icon">🌡️</span>Фен / тепловая пушка</li>
+          <li class="rule-item"><span class="rule-icon">🎬</span>Малярный скотч</li>
+          <li class="rule-item"><span class="rule-icon">🧤</span>Перчатки нитриловые</li>
+          <li class="rule-item"><span class="rule-icon">🧻</span>Безворсовые салфетки</li>
+          <li class="rule-item"><span class="rule-icon">🔩</span>Торкс / крестовые отвёртки, щипцы</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📐 Параметры клея</div>
+        <table class="tbl">
+          <tr><th>Параметр</th><th>Значение</th></tr>
+          <tr><td>Высота валика</td><td>8–12 мм</td></tr>
+          <tr><td>Ширина валика</td><td>8–10 мм</td></tr>
+          <tr><td>Время до установки стекла</td><td>Не более 10 мин</td></tr>
+          <tr><td>Клей после праймера</td><td>В течение 60 мин</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ВРЕМЯ ПОЛИМЕРИЗАЦИИ -->
+    <div class="pane" id="p-z-time">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⏱️ Время полимеризации (SDAT)</div>
+        <div class="warn">⚠️ SDAT (Safe Drive Away Time) — минимальное время до выезда. Критически важный параметр! Всегда смотри в документацию конкретного клея.</div>
+        <table class="tbl" style="margin-top:10px;">
+          <tr><th>Температура</th><th>Влажность</th><th>Мин. до выезда</th><th>Полная полимеризация</th></tr>
+          <tr><td>+5°C</td><td>50%</td><td style="color:var(--red);font-weight:700;">8–12 часов</td><td>72 часа</td></tr>
+          <tr><td>+15°C</td><td>50%</td><td style="color:var(--amber);font-weight:700;">4–6 часов</td><td>48 часов</td></tr>
+          <tr><td>+20°C</td><td>50–65%</td><td style="color:var(--amber);font-weight:700;">1–2 часа</td><td>24 часа</td></tr>
+          <tr><td>+25°C и выше</td><td>65%+</td><td style="color:var(--green);font-weight:700;">30–60 мин</td><td>12–24 часа</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">✅ Проверка результата</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">👁️</span><strong>Визуально:</strong> равномерный зазор, нет пузырей в шве (осмотр с торца), молдинги без перекосов</li>
+          <li class="rule-item"><span class="rule-icon">💧</span><strong>Герметичность:</strong> полить водой по периметру без напора → осмотреть салон</li>
+          <li class="rule-item"><span class="rule-icon">⚡</span><strong>Электрика:</strong> обогрев стекла, датчик дождя, дворники</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ОШИБКИ -->
+    <div class="pane" id="p-z-err">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⚠️ Типичные ошибки</div>
+        <table class="tbl">
+          <tr><th>Ошибка</th><th>Последствие</th><th>Как избежать</th></tr>
+          <tr><td>Жирные руки на кайме</td><td>Клей не держится, протечка</td><td>Всегда в нитриловых перчатках</td></tr>
+          <tr><td>Старый клей срезан до металла</td><td>Коррозия, плохая адгезия</td><td>Оставлять слой 1–2 мм</td></tr>
+          <tr><td>Пропущен участок клея</td><td>Протечка, свист на ходу</td><td>Наносить непрерывным валиком</td></tr>
+          <tr><td>Стекло сдвинуто после установки</td><td>Разрыв шва, негерметичность</td><td>Первый раз точно, без поправок</td></tr>
+          <tr><td>Выезд до полимеризации</td><td>Стекло не держит удар — опасность!</td><td>Соблюдать SDAT производителя</td></tr>
+          <tr><td>Праймер нанесён слишком давно</td><td>Потеря адгезии</td><td>Клей — в течение 60 мин после праймера</td></tr>
+          <tr><td>Работа при низкой температуре</td><td>Клей не полимеризует</td><td>Минимум +5°C, оптимум +15°C</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 </div><!-- end content -->
 
 <!-- КНОПКА НАВЕРХ -->
@@ -1118,6 +1328,9 @@ body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min
   </button>
   <button class="bnav-btn" id="nav-biznes" onclick="filterGroup('biznes',this)">
     <span class="bnav-icon">💼</span>Бизнес
+  </button>
+  <button class="bnav-btn" id="nav-zamena" onclick="filterGroup('zamena',this)">
+    <span class="bnav-icon">🔧</span>Замена
   </button>
 </nav>
 
