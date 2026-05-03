@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="База знаний">
+<title>GMA · База знаний</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg:#0a0c10; --surface:#12151c; --card:#1a1e28; --border:#252a38;
+  --accent:#3b82f6; --accent2:#06b6d4; --gold:#f59e0b; --green:#10b981;
+  --red:#ef4444; --orange:#f97316; --purple:#8b5cf6;
+  --text:#e2e8f0; --muted:#64748b; --dim:#334155;
+  --nav-h:60px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--nav-h) + 16px);}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0f1724,#0a0c10);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;}
+.hdr-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hdr-sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.hdr-badge{margin-left:auto;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:var(--accent);padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+
+/* SEARCH */
+.search-wrap{padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:99;}
+.search-input{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 34px;font-family:'Manrope',sans-serif;font-size:13px;border-radius:8px;outline:none;}
+.search-input:focus{border-color:var(--accent);}
+.search-icon{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;}
+.search-wrap{position:relative;}
+
+/* CONTENT */
+.content{padding:12px 14px;}
+
+/* SECTION */
+.section{margin-bottom:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.section-hdr{display:flex;align-items:center;padding:12px 14px;cursor:pointer;background:var(--surface);gap:10px;user-select:none;}
+.section-hdr:active{background:var(--card);}
+.section-icon{font-size:18px;flex-shrink:0;}
+.section-title{font-size:14px;font-weight:700;flex:1;}
+.section-count{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;background:var(--card);padding:2px 7px;border-radius:10px;}
+.section-arrow{color:var(--muted);font-size:16px;transition:transform 0.2s;flex-shrink:0;}
+.section.open .section-arrow{transform:rotate(90deg);}
+.section-body{display:none;border-top:1px solid var(--border);}
+.section.open .section-body{display:block;}
+
+/* TAB BUTTONS inside section */
+.tab-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--bg);}
+.pill-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;transition:all 0.15s;}
+.pill-btn:active,.pill-btn.active{background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.4);color:var(--accent2);}
+
+/* PANE */
+.pane{display:none;padding:12px;}
+.pane.active{display:block;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--card-accent,var(--accent));}
+.card-title{font-weight:700;font-size:13px;margin-bottom:9px;display:flex;align-items:center;gap:6px;padding-left:4px;}
+
+/* GRID — мобильный всегда 1 колонка, на широком 2 */
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px;}
+@media(min-width:600px){.grid.g2{grid-template-columns:1fr 1fr}.grid.g3{grid-template-columns:1fr 1fr 1fr}.grid.g4{grid-template-columns:1fr 1fr}}
+
+/* STEPS */
+.steps{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.step{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.5;}
+.step-num{min-width:20px;height:20px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:var(--accent2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.step-text{color:#cbd5e1;padding-top:1px;}
+
+/* RULE LIST */
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.rule-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#cbd5e1;line-height:1.5;}
+.rule-icon{flex-shrink:0;width:16px;text-align:center;font-size:13px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;overflow:hidden;border-radius:6px;}
+.tbl th{background:rgba(255,255,255,0.04);color:var(--muted);text-align:left;padding:6px 8px;font-weight:700;text-transform:uppercase;font-size:9px;border-bottom:1px solid var(--border);}
+.tbl td{padding:6px 8px;border-bottom:1px solid rgba(37,42,56,0.5);color:#cbd5e1;vertical-align:top;font-size:11px;}
+.tbl tr:last-child td{border-bottom:none;}
+
+/* ALERTS */
+.warn{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:7px;padding:8px 11px;font-size:12px;color:#fca5a5;margin-top:8px;display:flex;gap:6px;align-items:flex-start;}
+.info{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:7px;padding:8px 11px;font-size:12px;color:#93c5fd;margin-top:8px;display:flex;gap:6px;align-items:flex-start;}
+.success{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:7px;padding:8px 11px;font-size:12px;color:#6ee7b7;margin-top:8px;display:flex;gap:6px;align-items:flex-start;}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+.tag{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.tag.blue{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--accent2);}
+.tag.green{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);}
+.tag.red{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);}
+.tag.gold{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--gold);}
+.tag.orange{background:rgba(249,115,22,0.1);border-color:rgba(249,115,22,0.3);color:var(--orange);}
+
+/* SCHEME */
+.scheme{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:8px 0;font-size:11px;}
+.scheme-step{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);padding:2px 8px;border-radius:5px;color:var(--accent2);font-weight:700;font-size:10px;}
+.scheme-arrow{color:var(--muted);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0;}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(18,21,28,0.95);border-top:1px solid var(--border);display:flex;align-items:stretch;z-index:200;backdrop-filter:blur(12px);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;transition:color 0.15s;padding:4px 2px;}
+.bnav-btn:active,.bnav-btn.active{color:var(--accent2);}
+.bnav-icon{font-size:18px;line-height:1;}
+
+/* SCROLL TO TOP */
+.scroll-top{position:fixed;bottom:calc(var(--nav-h) + 12px);right:14px;background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.4);color:var(--accent2);width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:16px;z-index:150;}
+.scroll-top.show{display:flex;}
+
+/* SEARCH HIGHLIGHT */
+.search-group{display:none;}
+.search-group.show{display:block;}
+.hl{background:rgba(245,158,11,0.25);color:var(--gold);border-radius:2px;padding:0 1px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">GMA · База знаний</div>
+    <div class="hdr-sub">Обучение работе со стёклами</div>
+  </div>
+  <div class="hdr-badge">31 материал</div>
+</div>
+
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" type="text" placeholder="Поиск по базе знаний..." id="search" oninput="doSearch(this.value)">
+</div>
+
+<div class="content" id="main-content">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 1: ТЕОРИЯ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-teoria" data-group="teoria">
+  <div class="section-hdr" onclick="toggleSection('g-teoria')">
+    <span class="section-icon">🎓</span>
+    <span class="section-title">Теория</span>
+    <span class="section-count">4 раздела</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-teoria','p-teoriya',this)">🔬 Виды стёкол</button>
+      <button class="pill-btn" onclick="showPane('g-teoria','p-markirovka',this)">🏷️ Маркировка</button>
+      <button class="pill-btn" onclick="showPane('g-teoria','p-himiya',this)">🧪 Химия GLAZIS</button>
+      <button class="pill-btn" onclick="showPane('g-teoria','p-tehspec',this)">📋 Тех.спец.</button>
+    </div>
+
+    <!-- ВИДЫ СТЁКОЛ -->
+    <div class="pane active" id="p-teoriya">
+      <div class="card" style="--card-accent:#3b82f6;">
+        <div class="card-title">🔬 Что такое стекло</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">⚗️</span>Аморфный прозрачный материал без кристаллической решётки</li>
+          <li class="rule-item"><span class="rule-icon">🪨</span><strong>Кварцевый песок (SiO₂)</strong> — прозрачность и твёрдость</li>
+          <li class="rule-item"><span class="rule-icon">🧂</span><strong>Сода (Na₂CO₃)</strong> — снижает температуру плавления</li>
+          <li class="rule-item"><span class="rule-icon">🧱</span><strong>Известь (CaO)</strong> — прочность и химическая устойчивость</li>
+          <li class="rule-item"><span class="rule-icon">💎</span>Твёрдость по Моосу: 5–6 (твёрже большинства пластиков)</li>
+          <li class="rule-item"><span class="rule-icon">🧪</span>Химически стойко к большинству кислот (кроме фтористоводородной)</li>
+        </ul>
+      </div>
+      <div class="card" style="--card-accent:#f59e0b;">
+        <div class="card-title">🏗️ Виды по составу</div>
+        <table class="tbl"><tr><th>Вид</th><th>Особенность</th></tr>
+          <tr><td>Силикатное</td><td>Обычное оконное: кварц + сода + известь</td></tr>
+          <tr><td>Боросиликатное</td><td>Жаропрочное (Pyrex) — оксид бора</td></tr>
+          <tr><td>Кварцевое</td><td>Почти чистый SiO₂ — прочное и термостойкое</td></tr>
+          <tr><td>Свинцовое</td><td>Хрусталь — высокий коэф. преломления</td></tr>
+        </table>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#64748b;">
+          <div class="card-title">⬜ Сырое</div>
+          <div class="tags"><span class="tag green">✅ Дёшево</span><span class="tag green">✅ Легко обрабатывать</span></div>
+          <div class="tags"><span class="tag red">❌ Хрупкое</span><span class="tag red">❌ Острые осколки</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:7px;">Толщина 2–6 мм. При обработке — аккуратное давление!</div>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🛡️ Закалённое</div>
+          <div class="tags"><span class="tag green">5–7× прочнее</span><span class="tag blue">до 200°C</span></div>
+          <div class="tags"><span class="tag red">❌ Нельзя обрабатывать после закалки</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:7px;">При разрушении — мелкие безопасные кусочки.</div>
+        </div>
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🪟 Триплекс</div>
+          <div class="tags"><span class="tag blue">Лобовые авто</span><span class="tag green">Безопасный</span></div>
+          <ul class="rule-list" style="margin-top:7px;">
+            <li class="rule-item"><span class="rule-icon">📽️</span>2–3 слоя стекла + ПВБ-плёнка</li>
+            <li class="rule-item"><span class="rule-icon">🔇</span>Звукоизоляция, задерживает 95–97% УФ</li>
+            <li class="rule-item"><span class="rule-icon">✅</span>При ударе осколки остаются на плёнке</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">🔫 Бронированное</div>
+          <div class="tags"><span class="tag red">Б1 ~20мм</span><span class="tag red">Б3 ~25мм</span><span class="tag red">Б6 36–42мм</span></div>
+          <ul class="rule-list" style="margin-top:7px;">
+            <li class="rule-item"><span class="rule-icon">💣</span>Несколько слоёв закалённого + ПВБ + поликарбонат</li>
+            <li class="rule-item"><span class="rule-icon">❌</span>При повреждении — полная замена блока</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#06b6d4;">
+        <div class="card-title">🏭 Как определить тип стекла</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Маркировка</strong> — ищи клеймо: TEMPERED, LAMINATED, DOT, E-маркировка</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Визуально:</strong> сырое — ровное; закалённое — волновые искажения под углом</div></li>
+          <li class="step"><div class="step-num">🔥</div><div class="step-text"><strong>Метод зажигалки:</strong> 1 огонёк = одинарное, 2 = стеклопакет, 3+ = многокамерный</div></li>
+        </ul>
+        <div class="warn">⚠️ Напыления — полировка РАЗРУШИТ покрытие! Проверь перед работой</div>
+      </div>
+      <div class="card" style="--card-accent:#f59e0b;">
+        <div class="card-title">🌍 Крупнейшие производители</div>
+        <table class="tbl"><tr><th>Производитель</th><th>Страна</th><th>Специализация</th></tr>
+          <tr><td><strong>AGC (Asahi Glass)</strong></td><td>Япония</td><td>Авто, архитектурное, энергосберегающее</td></tr>
+          <tr><td><strong>Fuyao Glass</strong></td><td>Китай</td><td>Автомобильное (лобовые, боковые, задние)</td></tr>
+          <tr><td><strong>Pilkington</strong></td><td>Великобритания</td><td>Изобретатель флоат-стекла</td></tr>
+          <tr><td><strong>Saint-Gobain</strong></td><td>Франция</td><td>Мировой лидер: Climalit, Cool-Lite</td></tr>
+          <tr><td><strong>Guardian Glass</strong></td><td>США</td><td>Флоат, закалённое, ламинированное</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- МАРКИРОВКА -->
+    <div class="pane" id="p-markirovka">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🇺🇸 DOT-маркировка</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📋</span>Соответствие американским нормам безопасности</li>
+            <li class="rule-item"><span class="rule-icon">🔢</span>Рядом номер производителя: DOT-563</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🇪🇺 E-маркировка</div>
+          <table class="tbl"><tr><th>Код</th><th>Страна</th></tr>
+            <tr><td>E1</td><td>Германия</td></tr><tr><td>E2</td><td>Франция</td></tr>
+            <tr><td>E4</td><td>Нидерланды</td></tr><tr><td>E5</td><td>Швеция</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#f59e0b;">
+        <div class="card-title">💡 AS — светопропускание</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">AS1</span>≥70% — лобовые стёкла</li>
+          <li class="rule-item"><span class="rule-icon">AS2</span>≥70% — боковые стёкла передних дверей</li>
+          <li class="rule-item"><span class="rule-icon">AS3</span>&lt;70% — задние и затемнённые</li>
+        </ul>
+      </div>
+      <div class="card" style="--card-accent:#8b5cf6;">
+        <div class="card-title">🔍 Дополнительные обозначения</div>
+        <div class="success">LAMINATED — триплекс (многослойное)</div>
+        <div class="success">TEMPERED — закалённое</div>
+        <div class="success">TINTED — тонированное</div>
+        <div class="success">UV — защита от ультрафиолета</div>
+        <div class="success">Solar Control — солнцезащитное напыление</div>
+        <div class="info">Пример: DOT-563 AS1 M848 E1 43R-000123</div>
+      </div>
+    </div>
+
+    <!-- ХИМИЯ GLAZIS -->
+    <div class="pane" id="p-himiya">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🫧 EMIK (1 FAZA)</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>Концентрат, 500 мл. Разбавить 1:35 водой</li>
+            <li class="rule-item"><span class="rule-icon">🎯</span>Промывка сколов и трещин шприцем</li>
+            <li class="rule-item"><span class="rule-icon">🚿</span>Мойка автомобиля</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#f97316;">
+          <div class="card-title">🔥 IPA ZIRUNET</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>Готовый состав, 530 мл</li>
+            <li class="rule-item"><span class="rule-icon">🧻</span>Нанести на фибру → протереть поверхность</li>
+          </ul>
+          <div class="warn">🔥 Легко воспламеняется! Не вблизи огня!</div>
+        </div>
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🧹 KLINOL</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>Готовый состав, 250 мл</li>
+            <li class="rule-item"><span class="rule-icon">🔫</span>Распылить → протереть сухой фиброй</li>
+          </ul>
+          <div class="warn">❄️ Не допускать замораживания!</div>
+        </div>
+        <div class="card" style="--card-accent:#06b6d4;">
+          <div class="card-title">1️⃣ GLAZIS STEP 1 — очиститель</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>250 мл · расход 30 г/м²</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Обороты: 600–1000 об/мин</li>
+            <li class="rule-item"><span class="rule-icon">🟢</span>Фетровый круг + горячая вода ≥36°C</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">2️⃣ GLAZIS STEP 2 — режущий</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>250 мл · расход 80 г/м²</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Обороты: 1000 об/мин</li>
+            <li class="rule-item"><span class="rule-icon">🔄</span>Взбалтывать перед каждым применением!</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#8b5cf6;">
+          <div class="card-title">3️⃣ GLAZIS STEP 3 — финишный</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>250 мл · расход 40 г/м²</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Обороты: 1000 об/мин</li>
+            <li class="rule-item"><span class="rule-icon">🔵</span>Твёрдый поролоновый круг</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">💎 POLYGLASS STEP 1 (вязкость 18)</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>Готовый состав, 30 мл</li>
+            <li class="rule-item"><span class="rule-icon">🎯</span>Ремонт тонких трещин и сколов</li>
+            <li class="rule-item"><span class="rule-icon">💡</span>УФ-лампой 5 мин; остаток — лезвием</li>
+          </ul>
+          <div class="warn">☀️ Хранить в темноте — без прямых УФ-лучей!</div>
+        </div>
+        <div class="card" style="--card-accent:#f97316;">
+          <div class="card-title">💎 POLYGLASS STEP 2 (вязкость 2000–3000)</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>Готовый состав, 30 мл</li>
+            <li class="rule-item"><span class="rule-icon">🎯</span>Запечатывающий — после Step 1</li>
+            <li class="rule-item"><span class="rule-icon">💡</span>Убрать пузыри скрайбером → пластинка → УФ 5–10 мин</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТЕХ СПЕЦИФИКАЦИЯ -->
+    <div class="pane" id="p-tehspec">
+      <div class="card" style="--card-accent:#3b82f6;">
+        <div class="card-title">⚙️ Шлифовальные круги Mirka Abralon</div>
+        <table class="tbl"><tr><th>Артикул</th><th>Назначение</th><th>Обороты</th></tr>
+          <tr><td>P180</td><td>Основная шлифовка</td><td>1400 об/мин</td></tr>
+          <tr><td>P360</td><td>Перебить риску после 180</td><td>1400 об/мин</td></tr>
+          <tr><td>P500</td><td>Перебить риску после 360</td><td>1400 об/мин</td></tr>
+          <tr><td>P1000</td><td>Деликатная шлифовка</td><td>1400 об/мин</td></tr>
+        </table>
+        <div class="info">💡 Признак замены: из-под круга перестаёт лететь стеклянная пыль. Работа без воды на обезжиренном стекле!</div>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🟢 Войлочный круг SEVEN Ø125</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🎯</span>Полировка стекла и твёрдых поверхностей</li>
+            <li class="rule-item"><span class="rule-icon">🔄</span>Ресурс: 10–15 машин</li>
+            <li class="rule-item"><span class="rule-icon">🪥</span>Иметь 2–3 комплекта: при нагреве менять</li>
+            <li class="rule-item"><span class="rule-icon">⚠️</span>Не снимать с подложки — растянется!</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#06b6d4;">
+          <div class="card-title">🔵 Glass Polish Pad Ø75 (войлок)</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🎯</span>Локальная полировка, края стёкол</li>
+            <li class="rule-item"><span class="rule-icon">🔄</span>Ресурс: 7–10 машин</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Низкие обороты, не работать на сухую</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">🌡️ Пирометр Kraftool TRM-380</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📊</span>Шлифовка: норма 40–45°C</li>
+            <li class="rule-item"><span class="rule-icon">📊</span>Полировка: норма 50–70°C</li>
+            <li class="rule-item"><span class="rule-icon">📊</span>Часы/Apple Watch: строго до 30°C</li>
+            <li class="rule-item"><span class="rule-icon">📊</span>Плиты: норма 45–50°C</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">⚙️ Машинка SEVEN ROTOR Ø150</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">💰</span>17 990 ₽ · Полировка ЛКП и стекла</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Очистка Step 1: 600–1000 об/мин</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Шлифовка: 1000–1400 об/мин</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Полировка: 1000–1350 об/мин</li>
+          </ul>
+          <div class="warn">🔥 Рука всегда в движении — остановка = перегрев!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 2: АВТО СТЁКЛА -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-auto" data-group="auto">
+  <div class="section-hdr" onclick="toggleSection('g-auto')">
+    <span class="section-icon">🚗</span>
+    <span class="section-title">Авто стёкла</span>
+    <span class="section-count">5 разделов</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-auto','p-svodna',this)">📊 Сводная</button>
+      <button class="pill-btn" onclick="showPane('g-auto','p-lobovoe',this)">🔵 Лобовое</button>
+      <button class="pill-btn" onclick="showPane('g-auto','p-bokovoe',this)">🟢 Боковое</button>
+      <button class="pill-btn" onclick="showPane('g-auto','p-zadnee',this)">🟠 Заднее</button>
+      <button class="pill-btn" onclick="showPane('g-auto','p-panorama',this)">🟣 Панорама</button>
+    </div>
+
+    <!-- СВОДНАЯ -->
+    <div class="pane active" id="p-svodna">
+      <div class="card" style="--card-accent:#3b82f6;">
+        <div class="card-title">📋 Общий алгоритм — одинаков для всех стёкол</div>
+        <table class="tbl"><tr><th>#</th><th>Шаг</th><th>Действие</th></tr>
+          <tr><td>1</td><td>Подготовка</td><td>Перчатки + маска. Скотч вокруг. Защитная плёнка. Очистить KLINOL.</td></tr>
+          <tr><td>2</td><td>Чистка</td><td>Роторная + фетровый 125мм + GLAZIS STEP 1. Змейки на 1000 об/мин.</td></tr>
+          <tr><td>3</td><td>Обезжир.</td><td>IPA ZIRUNET перед шлифовкой.</td></tr>
+          <tr><td>4</td><td>Шлифовка</td><td>Подложка 150. 1000–1350 об/мин. 40–45°C. Горячая вода. 5–6 змеек.</td></tr>
+          <tr><td>5–6</td><td>Полировка</td><td>Фетровый 125мм + GLAZIS STEP 2. 1000–1350 об/мин. 50–70°C.</td></tr>
+          <tr><td>6–7</td><td>Финиш</td><td>Поролон 125мм + GLAZIS STEP 3. 1000 об/мин. До высыхания пасты.</td></tr>
+          <tr><td>8</td><td>Завершение</td><td>Снять плёнку и скотч. Установить снятые элементы.</td></tr>
+        </table>
+        <div class="warn">⚠️ Лобовое: цепочка шлифовки длиннее — 7 градаций! Порядок полировки краёв — другой.</div>
+      </div>
+      <div class="card" style="--card-accent:#06b6d4;">
+        <div class="card-title">🔍 Отличия по типам</div>
+        <table class="tbl"><tr><th>Параметр</th><th>🔵 Лобовое</th><th>🟢 Боковое</th><th>🟠 Заднее</th></tr>
+          <tr><td>1-й круг</td><td><span class="tag red">P80 жёсткий!</span></td><td>P180</td><td>P180</td></tr>
+          <tr><td>Цепочка</td><td>P80→P120→P150→P180+P180→P360→P500→P1000</td><td>P180→P360→P500→P1000</td><td>P180→P360→P500→P1000</td></tr>
+          <tr><td>Змейки P1000</td><td>2–3 змейки</td><td>5–6 змеек</td><td>5–6 змеек</td></tr>
+          <tr><td>Полировка</td><td>Сначала КРАЯ, потом ОСНОВНАЯ</td><td>Основная → края</td><td>Основная → края</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ЛОБОВОЕ -->
+    <div class="pane" id="p-lobovoe">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🛠️ Инструмент</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🔧</span>Съёмник дворников, клипсосъёмники, нож с лезвием</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Роторная машинка, фетровый 125+75мм, поролон</li>
+            <li class="rule-item"><span class="rule-icon">🔴</span>Жёсткие круги P80, P120, P150, P180 + Abralon P180–P1000</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">⚠️ Главные особенности</div>
+          <div class="warn">🔴 Начинать с P80 (жёсткий круг!)</div>
+          <div class="warn">🔄 Порядок полировки: СНАЧАЛА КРАЯ, потом ОСНОВНАЯ</div>
+          <div class="warn">📏 На P1000: только 2–3 змейки</div>
+          <div class="info">💡 Цепочка: P80→P120→P150→P180→P180(Abralon)→P360→P500→P1000 = 7 градаций!</div>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Пошаговая инструкция</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Узнать у клиента про датчики. Снять дворники + жабо. Укрыть авто плёнкой, скотч в несколько слоёв</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Очистка машинкой: фетровый 125мм + GLAZIS STEP 1, 1000 об/мин</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Обезжирить IPA ZIRUNET. Надеть маску!</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Шлифовка: P80→P120 (5-6 зм.)→P150→P180→Abralon P180→P360→P500→P1000 (2–3 зм.). Норма 40–45°C</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">КРАЯ: фетровый 75мм + GLAZIS STEP 2 → по периметру</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">ОСНОВНАЯ полировка: фетровый 125мм + GLAZIS STEP 2. До полной прозрачности. 50–70°C</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Финиш: поролон 125мм + GLAZIS STEP 3. До высыхания пасты</div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text">Снять плёнку/скотч. Промыть шампунем 1 фазы. Установить дворники, жабо</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- БОКОВОЕ -->
+    <div class="pane" id="p-bokovoe">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🛠️ Уникальный инструмент</div>
+          <div class="success">✅ X-образная стойка + пластиковые стяжки</div>
+          <div class="success">✅ Стоматологический инструмент</div>
+          <div class="success">✅ Клипсосъёмники для дверной карты</div>
+        </div>
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">⚠️ Особенности</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📐</span>Начало шлифовки с P180 (не P80)</li>
+            <li class="rule-item"><span class="rule-icon">📏</span>P1000: 5–6 змеек</li>
+            <li class="rule-item"><span class="rule-icon">🔄</span>Порядок: сначала ОСНОВНАЯ, потом КРАЯ</li>
+            <li class="rule-item"><span class="rule-icon">📐</span>Выходить за край стекла на 2 см</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#06b6d4;">
+        <div class="card-title">📋 Последовательность</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Найти инструкцию по разборке дверной карты. Демонтировать карту, стойки, молдинги, электронику</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Закрепить стекло на X-стойке стяжками. Очистить KLINOL</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Очистка: фетровый 125мм + GLAZIS STEP 1</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Шлифовка: P180→P360 (5-6 зм.)→P500→P1000 (5-6 зм.). 40–45°C</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">ОСНОВНАЯ полировка: фетровый 125мм + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">КРАЯ: фетровый 75мм + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Финиш: поролон 125мм + GLAZIS STEP 3. KLINOL</div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text">Установить стекло обратно. Обратная сборка карты</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ЗАДНЕЕ -->
+    <div class="pane" id="p-zadnee">
+      <div class="card" style="--card-accent:#f97316;">
+        <div class="card-title">⚠️ Особенности заднего стекла</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🔌</span>Снять провода обогрева до начала работы</li>
+          <li class="rule-item"><span class="rule-icon">🔄</span>Порядок: сначала ОСНОВНАЯ полировка, потом КРАЯ</li>
+          <li class="rule-item"><span class="rule-icon">📏</span>P1000: 5–6 змеек (как боковое)</li>
+          <li class="rule-item"><span class="rule-icon">🎬</span>Укрыть авто → вырезать по контуру стекла → скотч к кузову</li>
+        </ul>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Последовательность</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Снять дворники (если есть), карту багажника, спойлер, провода</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Очистка: GLAZIS STEP 1 + фетровый 125мм</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Обезжирить IPA ZIRUNET</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Шлифовка: P180→P360→P500→P1000 (5-6 зм.). 40–45°C</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">ОСНОВНАЯ полировка: фетровый 125мм + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">КРАЯ: фетровый 75мм + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Финиш: GLAZIS STEP 3 + поролон → KLINOL</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ПАНОРАМА -->
+    <div class="pane" id="p-panorama">
+      <div class="card" style="--card-accent:#8b5cf6;">
+        <div class="card-title">⚠️ Главная особенность</div>
+        <div class="warn">🟣 НЕ СНИМАЕТСЯ! Заклеить, вырезать по контуру</div>
+        <ul class="rule-list" style="margin-top:9px;">
+          <li class="rule-item"><span class="rule-icon">🏗️</span>Нужна возвышенность для мастера</li>
+          <li class="rule-item"><span class="rule-icon">🟣</span>Фетровый брусок для труднодоступных мест</li>
+          <li class="rule-item"><span class="rule-icon">📏</span>P1000: 5–6 змеек (как боковое)</li>
+          <li class="rule-item"><span class="rule-icon">🔄</span>Порядок: сначала ОСНОВНАЯ, потом КРАЯ</li>
+        </ul>
+      </div>
+      <div class="card" style="--card-accent:#06b6d4;">
+        <div class="card-title">📋 Последовательность</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Заклеить скотчем по периметру. Вырезать по контуру. Укрыть салон</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Очистка: GLAZIS STEP 1 + фетровый 125мм</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Обезжирить IPA ZIRUNET</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Шлифовка: P180→P360→P500→P1000 (5-6 зм.). 40–45°C</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">ОСНОВНАЯ полировка: фетровый + GLAZIS STEP 2. С возвышенности!</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">КРАЯ: фетровый брусок + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Финиш: GLAZIS STEP 3 → KLINOL → снять скотч</div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 3: РЕМОНТ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-remont" data-group="remont">
+  <div class="section-hdr" onclick="toggleSection('g-remont')">
+    <span class="section-icon">🔧</span>
+    <span class="section-title">Ремонт</span>
+    <span class="section-count">2 раздела</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-remont','p-skoly',this)">💥 Сколы</button>
+      <button class="pill-btn" onclick="showPane('g-remont','p-treshiny',this)">⚡ Трещины</button>
+    </div>
+
+    <!-- СКОЛЫ -->
+    <div class="pane active" id="p-skoly">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🛠️ Инструмент</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">💉</span>Шприцы + груша/пылесос</li>
+            <li class="rule-item"><span class="rule-icon">🔩</span>Мост-инжектор + скрайбер</li>
+            <li class="rule-item"><span class="rule-icon">💡</span>УФ-лампа + зеркало</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>Шаровидное сверло (бор-машинка)</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">🧪 Составы</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🫧</span>EMIK 1 FAZA — шампунь 1 фазы (1:35)</li>
+            <li class="rule-item"><span class="rule-icon">💎</span>POLYGLASS STEP 1 — вязкость 18 (основной)</li>
+            <li class="rule-item"><span class="rule-icon">💎</span>POLYGLASS STEP 2 — вязкость 2000–3000 (запечатывающий)</li>
+            <li class="rule-item"><span class="rule-icon">✨</span>PASTIX 2 Step — паста для полировки</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#06b6d4;">
+        <div class="card-title">📋 Пошаговый ремонт скола</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Пролить скол EMIK 1:35 через шприц. Старый скол — повторить несколько раз</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Зеркало с внутренней стороны. Шаровидное сверло → центр скола под углом → углубиться 1 шар</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Снова пролить EMIK. Грушей убрать влагу. Обезжирить IPA ZIRUNET + щёткой</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Нанести каплю POLYGLASS STEP 1. Продавить скол и все лучи</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Мост-инжектор. 5–10 капель STEP 1. Закрутить шток до давления. <strong>Держать 1,5 мин</strong></div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">Цикл давление-вакуум: выкрутить шток → вакуум 1–1,5 мин → при необходимости подогреть зажигалкой → снова давление. Повторять пока лучи не заполнены</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Снять мост. Нанести POLYGLASS STEP 2. Убрать пузыри скрайбером. Пластинка → УФ-лампа 2–3 минуты</div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text">Лезвие под прямым углом → зачистить полимер</div></li>
+          <li class="step"><div class="step-num">9</div><div class="step-text">Полировка: фетровый круг + капля PASTIX. 600–800 об/мин до прозрачности → KLINOL</div></li>
+        </ul>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#f97316;">
+          <div class="card-title">📌 Правила держания</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">✍️</div><div class="step-text"><strong>Держать как ручку</strong> — второй рукой поддерживать у основания</div></li>
+            <li class="step"><div class="step-num">⏱️</div><div class="step-text">Инжектор на давлении: <strong>1,5–2 минуты</strong></div></li>
+            <li class="step"><div class="step-num">💡</div><div class="step-text">УФ-лампа: <strong>1,5–2 минуты</strong></div></li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">⚡ Если полимер уходит из лучей</div>
+          <div class="info">💡 Снова создай давление инжектором + УФ-лампу с обратной стороны на 40–50 сек — полимер «запечётся»</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТРЕЩИНЫ -->
+    <div class="pane" id="p-treshiny">
+      <div class="warn" style="margin-bottom:12px;">⚠️ <strong>Старые трещины НЕ берём в ремонт!</strong> Сначала осмотр и замер курвиметром.</div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">🧪 Специальные составы</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">💎</span><strong>NEWSTEK 36 CPS</strong> — основной полимер для трещин</li>
+            <li class="rule-item"><span class="rule-icon">💎</span><strong>NEWSTEK 400</strong> — полимер (основной)</li>
+            <li class="rule-item"><span class="rule-icon">💎</span><strong>NEWSTEK 3500 CPS</strong> — запечатывающий</li>
+            <li class="rule-item"><span class="rule-icon">🔩</span><strong>Металлическая вата</strong> — обязательна!</li>
+            <li class="rule-item"><span class="rule-icon">📏</span><strong>Курвиметр</strong> — измерить длину трещины</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">🔍 Шаг 2 — Осмотр</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">👁</div><div class="step-text">Определить с какой стороны трещина — внутренней или внешней</div></li>
+            <li class="step"><div class="step-num">📏</div><div class="step-text">Измерить длину курвиметром</div></li>
+            <li class="step"><div class="step-num">💬</div><div class="step-text">Предупредить клиента о рисках!</div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Пошаговый ремонт трещины</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Очистка:</strong> металлическая вата → щётка + EMIK 1 FAZA → IPA ZIRUNET → сжатый воздух → снова металлическая вата</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Остановка сверлением:</strong> скрайбером накернить на несколько мм от конца. Бор-машинка глубина 1–1,5 шара. Груша → POLYGLASS STEP 1 → пробойник</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Или зажигалкой:</strong> прогреть место куда нужно направить трещину + усилить давление изнутри</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text"><strong>Реставрация:</strong> Шприц с УФ-защитой → NEWSTEK 36 CPS. Вводить с верхней части. Расширитель с обратной стороны. Пролить всю длину по частям</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text"><strong>Полимеризация:</strong> УФ-лампа над пластинками → каждый участок 1,5–2 мин → лезвие вдоль трещины</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>Полировка:</strong> фетровый круг + PASTIX. 600–800 об/мин → KLINOL</div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 4: ДРУГИЕ ПОВЕРХНОСТИ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-other" data-group="other">
+  <div class="section-hdr" onclick="toggleSection('g-other')">
+    <span class="section-icon">✨</span>
+    <span class="section-title">Другие поверхности</span>
+    <span class="section-count">5 разделов</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-other','p-fary',this)">💡 Фары</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-lkp',this)">🎨 ЛКП</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-chasy-mex',this)">⌚ Мех.часы</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-chasy-epl',this)">📱 Apple Watch</button>
+      <button class="pill-btn" onclick="showPane('g-other','p-plita',this)">🍳 Плиты</button>
+    </div>
+
+    <!-- ФАРЫ -->
+    <div class="pane active" id="p-fary">
+      <div class="card" style="--card-accent:#f59e0b;">
+        <div class="card-title">📊 Пластик vs Стекло</div>
+        <table class="tbl"><tr><th>Параметр</th><th>Пластик</th><th>Стекло</th></tr>
+          <tr><td>Абразив</td><td>Koch H9, 3M Perfect-It</td><td>Оксид церия (GOI, CeriGlass)</td></tr>
+          <tr><td>Круг режущий</td><td>Поролон средний (оранжевый)</td><td>Войлок/фетр</td></tr>
+          <tr><td>Обороты грубо</td><td>1200–1500 об/мин</td><td>1000–1400 об/мин</td></tr>
+          <tr><td>Обороты финиш</td><td>900–1200 об/мин</td><td>900–1200 об/мин</td></tr>
+          <tr><td>Защита</td><td>UV-лак — ОБЯЗАТЕЛЬНО</td><td>Гидрофобное покрытие</td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:#f97316;">
+        <div class="card-title">🟡 Алгоритм: ПЛАСТИК</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Мойка + обезжирить + скотч вокруг</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">P400→P800 с водой (убрать верхний слой)</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">P1500→P2000→P3000</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Абразивная машинка: оранжевый круг 1200–1500 об/мин</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Финиш: мягкий круг 900–1200 об/мин</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">UV-лак: 2–3 тонких слоя. Сохнет 24 часа</div></li>
+        </ul>
+        <div class="warn">⚠️ Без UV-лака результат вернётся через 3–6 мес!</div>
+      </div>
+      <div class="warn">🔥 РОТОРНАЯ — рука всегда в движении! Остановка 2 сек = риск прожечь фару!</div>
+    </div>
+
+    <!-- ЛКП -->
+    <div class="pane" id="p-lkp">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">📋 Полный алгоритм</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">1</div><div class="step-text">Мойка → удаление битума → обезжирка → глина при необходимости</div></li>
+            <li class="step"><div class="step-num">2</div><div class="step-text">Паутинка → сразу полировка. Царапина цепляется ногтем → шлифовка P2000–P3000</div></li>
+            <li class="step"><div class="step-num">3</div><div class="step-text">Шлифовка (если нужно): P2000→P2500→P3000 с водой</div></li>
+            <li class="step"><div class="step-num">Cut</div><div class="step-text">Грубая паста + жёсткий круг</div></li>
+            <li class="step"><div class="step-num">Pol</div><div class="step-text">Средняя паста + средний круг</div></li>
+            <li class="step"><div class="step-num">Fin</div><div class="step-text">Финишная паста + мягкий круг</div></li>
+            <li class="step"><div class="step-num">7</div><div class="step-text">Защита: воск / силант / керамика после обезжирки</div></li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">📊 Сценарии</div>
+          <table class="tbl"><tr><th>Ситуация</th><th>Шаги</th></tr>
+            <tr><td>Лёгкие царапины</td><td>Средний+Средняя → Мягкий+Финиш</td></tr>
+            <tr><td>Освежение блеска</td><td>Только Мягкий+Финишная</td></tr>
+            <tr><td>Глубокие царапины</td><td>Шлифовка P2000–3000 → Cut→Pol→Fin</td></tr>
+          </table>
+          <div class="warn">❌ 1200–1800 об/мин. Крест-накрест. Не давить. Не стоять на месте!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МЕХ ЧАСЫ -->
+    <div class="pane" id="p-chasy-mex">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#64748b;"><div class="card-title">🔵 Акриловое</div><p style="font-size:12px;color:#cbd5e1;">Бюджет, спорт, ретро. Гибкое. Выдерживает 3–4 полировки. Легко полируется.</p></div>
+        <div class="card" style="--card-accent:#3b82f6;"><div class="card-title">⬜ Минеральное</div><p style="font-size:12px;color:#cbd5e1;">Кварцевый песок + кремний. Сложнее поддаётся полировке.</p></div>
+        <div class="card" style="--card-accent:#f59e0b;"><div class="card-title">💎 Сапфировое</div><p style="font-size:12px;color:#cbd5e1;">Дорогой сегмент. Идеальная прозрачность. Сложная шлифовка — нужны доп. инструменты.</p></div>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Пошаговая работа</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Закрепить на X-стойке. Контур-лента 2–3 слоя + армирующий скотч</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Обезжирить: бумажная салфетка + IPA ZIRUNET</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Шлифовка: Abralon P180→P360 (5–6 цик.)→P500→P1000. Обороты 650. Строго до 30°C!</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Полировка: фетровый 75мм + GLAZIS STEP 2. 650 об/мин</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Финиш: поролон 75мм + GLAZIS STEP 3. 650 об/мин</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">Осмотр под фонарём → снять скотч → KLINOL</div></li>
+        </ul>
+        <div class="warn">🌡️ Часы — маленькая площадь! Температура строго до 30°C. Пирометр каждые 2–3 цикла!</div>
+      </div>
+    </div>
+
+    <!-- APPLE WATCH -->
+    <div class="pane" id="p-chasy-epl">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#8b5cf6;">
+          <div class="card-title">⚠️ Отличие от мех. часов</div>
+          <div class="warn">🔘 Тщательно оклеить колёсико — оно выше корпуса!</div>
+          <div class="warn">✅ Проверить — работают ли часы до начала!</div>
+          <ul class="rule-list" style="margin-top:9px;">
+            <li class="rule-item"><span class="rule-icon">🎬</span>Только армирующий скотч (без контур-ленты)</li>
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Обороты: 650. Температура: до 30°C</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">📋 Последовательность</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">1</div><div class="step-text">X-стойка. Армирующий скотч (особо: колёсико!)</div></li>
+            <li class="step"><div class="step-num">2</div><div class="step-text">IPA ZIRUNET + бумажная салфетка</div></li>
+            <li class="step"><div class="step-num">3</div><div class="step-text">P180→P360 (5–6)→P500→P1000. 650 об/мин. До 30°C!</div></li>
+            <li class="step"><div class="step-num">4</div><div class="step-text">Фетровый 75мм + GLAZIS STEP 2. 650 об/мин</div></li>
+            <li class="step"><div class="step-num">5</div><div class="step-text">Поролон 75мм + GLAZIS STEP 3. 650 об/мин</div></li>
+            <li class="step"><div class="step-num">6</div><div class="step-text">Фонарь → снять скотч → KLINOL</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ПЛИТЫ -->
+    <div class="pane" id="p-plita">
+      <div class="card" style="--card-accent:#f97316;">
+        <div class="card-title">🌡️ Главное отличие: температура до 50°C (не 30°C!)</div>
+        <table class="tbl"><tr><th>Параметр</th><th>Часы</th><th>Плита</th></tr>
+          <tr><td>Температура</td><td>до 30°C</td><td><span class="tag orange">до 50°C</span></td></tr>
+          <tr><td>Начальный круг</td><td>Abralon P180</td><td>Abranet P80 (если нужно)</td></tr>
+          <tr><td>Защита разметки</td><td>—</td><td>Контурная лента 2 слоя!</td></tr>
+          <tr><td>Подложка</td><td>75/125</td><td>125/150</td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Последовательность</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Проверить работоспособность → обесточить → на стол</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Обезжирить бытовой химией или металлической ватой</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Контурная лента 2 слоя для защиты разметки</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Шлифовка: P180→P360→P500→P1000. До 50°C</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Полировка: фетровый + GLAZIS STEP 2</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">Финиш: поролон 125мм + GLAZIS STEP 3. До 50°C</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Фонарь → KLINOL</div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 5: АНТИДОЖДЬ -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-antidozh" data-group="antidozh">
+  <div class="section-hdr" onclick="toggleSection('g-antidozh')">
+    <span class="section-icon">🌧️</span>
+    <span class="section-title">Антидождь</span>
+    <span class="section-count">2 раздела</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-antidozh','p-antidozh',this)">💧 Нанесение</button>
+      <button class="pill-btn" onclick="showPane('g-antidozh','p-priemka',this)">🚗 Приёмка</button>
+    </div>
+
+    <div class="pane active" id="p-antidozh">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">📊 SEVEN vs LERATON</div>
+          <table class="tbl"><tr><th></th><th>SEVEN</th><th>LERATON</th></tr>
+            <tr><td>Слои</td><td>1</td><td>2</td></tr>
+            <tr><td>Срок</td><td>2–4 нед</td><td>до 6 мес</td></tr>
+            <tr><td>Мин. t°</td><td>+15°C</td><td>+10°C</td></tr>
+            <tr><td>До воды</td><td>24 ч</td><td>8 ч / 7 дн</td></tr>
+          </table>
+        </div>
+        <div class="card" style="--card-accent:#06b6d4;">
+          <div class="card-title">🌡️ Условия нанесения</div>
+          <table class="tbl">
+            <tr><td>Температура</td><td>+10°C … +50°C</td></tr>
+            <tr><td>Влажность</td><td>до 60%</td></tr>
+            <tr><td>Помещение</td><td>Закрытое, без сквозняков</td></tr>
+            <tr><td>Солнце</td><td>❌ Запрещено</td></tr>
+          </table>
+          <div class="info">💧 Проверка: дыхните на стекло — пятно исчезает за 2–3 сек → можно работать</div>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">📋 Нанесение SEVEN (5 шагов)</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Перчатки + нанести на микрофибру</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Кругами по участкам 30×30 см</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Выдержать 3–5 мин до лёгкой матовости</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Располировать чистой микрофиброй до прозрачности</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Не мыть 24 часа</div></li>
+        </ul>
+      </div>
+      <div class="card" style="--card-accent:#ef4444;">
+        <div class="card-title">⚠️ Частые ошибки</div>
+        <table class="tbl"><tr><th>Ошибка</th><th>Последствие</th></tr>
+          <tr><td>Грязное стекло</td><td>Разводы, не держится</td></tr>
+          <tr><td>Нанесение на солнце</td><td>Мгновенное испарение</td></tr>
+          <tr><td>Толстый слой</td><td>Трудно располировать</td></tr>
+          <tr><td>Попало на дворники</td><td>Дворники «прыгают»</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-priemka">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">👁 Что проверить</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🔍</span>Зона жабо и дворников</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>Кромка капота и молдинги</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>Боковые стёкла, панорама, заднее</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>Царапины снаружи и внутри</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>Сколы, трещины, кромка стекла</li>
+            <li class="rule-item"><span class="rule-icon">🔍</span>ЛКП на наличие дефектов</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">📷 Фиксация и подготовка</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">📸</div><div class="step-text">Фото/видео фиксация ВСЕХ дефектов. Обсудить с клиентом</div></li>
+            <li class="step"><div class="step-num">🎬</div><div class="step-text">Укрыть авто защитной плёнкой</div></li>
+            <li class="step"><div class="step-num">✂️</div><div class="step-text">Вырезать по периметру всех стёкол → скотч к кузову</div></li>
+            <li class="step"><div class="step-num">🪞</div><div class="step-text">Укрыть боковые зеркала</div></li>
+          </ul>
+          <div class="warn">⚠️ Фиксация обязательна — защищает и мастера, и клиента!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ГРУППА 6: БИЗНЕС -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="g-biznes" data-group="biznes">
+  <div class="section-hdr" onclick="toggleSection('g-biznes')">
+    <span class="section-icon">💼</span>
+    <span class="section-title">Бизнес</span>
+    <span class="section-count">4 раздела</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-biznes','p-ceny',this)">💰 Цены</button>
+      <button class="pill-btn" onclick="showPane('g-biznes','p-biznes',this)">📝 Регистрация</button>
+      <button class="pill-btn" onclick="showPane('g-biznes','p-bezop',this)">🛡️ Безопасность</button>
+      <button class="pill-btn" onclick="showPane('g-biznes','p-oborud',this)">📦 Оборудование</button>
+    </div>
+
+    <!-- ЦЕНЫ -->
+    <div class="pane active" id="p-ceny">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#10b981;">
+          <div class="card-title">📐 Формула цены</div>
+          <div class="success">💡 Прямые затраты + Переменные = Себестоимость</div>
+          <div class="success">💡 Себестоимость + Наценка = Цена</div>
+        </div>
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">📊 Расчёт постоянных расходов</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">1</div><div class="step-text">Посчитать сумму за месяц (аренда, свет, вода)</div></li>
+            <li class="step"><div class="step-num">2</div><div class="step-text">Разделить на 30 → расходы в день</div></li>
+            <li class="step"><div class="step-num">3</div><div class="step-text">Разделить дневные на 8 → стоимость 1 часа</div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#3b82f6;">
+        <div class="card-title">💰 Наши цены на услуги</div>
+        <div class="grid g2" style="margin-top:8px;">
+          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--accent2);margin-bottom:5px;">🔵 Лобовое</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 25 000 ₽</div>
+            <div style="font-size:12px;color:#cbd5e1;">Полировка от 15 000 ₽</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--green);margin-bottom:5px;">🟢 Боковое</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 12 000 ₽</div>
+          </div>
+          <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--orange);margin-bottom:5px;">🟠 Заднее</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 18 000 ₽</div>
+            <div style="font-size:12px;color:#cbd5e1;">Полировка от 10 000 ₽</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:5px;">💡 Варочная панель</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 10 000 ₽</div>
+          </div>
+          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--accent2);margin-bottom:5px;">⌚ Часы</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 6 000 ₽</div>
+          </div>
+          <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:10px;">
+            <div style="font-weight:700;color:var(--purple);margin-bottom:5px;">📱 Apple Watch</div>
+            <div style="font-size:12px;color:#cbd5e1;">Шлифовка от 10 000 ₽</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#8b5cf6;">
+        <div class="card-title">📦 Расход материалов на 1 услугу</div>
+        <table class="tbl">
+          <tr><th>Материал</th><th>Кол-во</th></tr>
+          <tr><td>Плёнка укрывная</td><td>5 метров</td></tr>
+          <tr><td>Скотч армированный</td><td>4 метра</td></tr>
+          <tr><td>Термоскотч</td><td>16 метров</td></tr>
+          <tr><td>Паста 1 степ</td><td>20 г</td></tr>
+          <tr><td>Паста 2 степ</td><td>40 г</td></tr>
+          <tr><td>Паста 3 степ</td><td>20 г</td></tr>
+          <tr><td>Круг P180</td><td>2 шт</td></tr>
+          <tr><td>Круги P360, P500, P1000</td><td>по 1 шт</td></tr>
+          <tr><td>Обезжириватель</td><td>100 мл</td></tr>
+          <tr><td>Микрофибры</td><td>4 шт</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- БИЗНЕС -->
+    <div class="pane" id="p-biznes">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#10b981;"><div class="card-title">👤 Самозанятый</div><ul class="rule-list"><li class="rule-item"><span class="rule-icon">💰</span>4% (физ.) / 6% (юр.)</li><li class="rule-item"><span class="rule-icon">📊</span>Лимит: 2.4 млн/год</li></ul></div>
+        <div class="card" style="--card-accent:#3b82f6;"><div class="card-title">🏆 ИП (Патент) — рекомендуем!</div><div class="success">Лимит до 60 млн ₽/год. Можно набирать команду.</div></div>
+        <div class="card" style="--card-accent:#ef4444;"><div class="card-title">🏢 ООО — не подходит</div><div class="warn">Штрафы в 10× больше. Сложный учёт наличных.</div></div>
+      </div>
+      <div class="card" style="--card-accent:#f59e0b;">
+        <div class="card-title">📋 Коды ОКВЭД</div>
+        <table class="tbl"><tr><th>Код</th><th>Направление</th></tr>
+          <tr><td>45.20.3</td><td>Работа с автомобилями — мойка, полирование</td></tr>
+          <tr><td>43.34</td><td>Малярные и стекольные работы</td></tr>
+          <tr><td>81.22</td><td>Чистка стёкол зданий</td></tr>
+        </table>
+      </div>
+      <div class="card" style="--card-accent:#10b981;">
+        <div class="card-title">✅ Пошаговый план</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Зарегистрировать ИП через банк с расчётным счётом. Патентная система</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Сделать стильную печать</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Сделать электронную подпись</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- БЕЗОПАСНОСТЬ -->
+    <div class="pane" id="p-bezop">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">⚙️ Машинки и круги</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">✅</div><div class="step-text">Проверять исправность машинки и крепления круга</div></li>
+            <li class="step"><div class="step-num">🛡️</div><div class="step-text">Перчатки + очки + маска (IV класс опасности)</div></li>
+            <li class="step"><div class="step-num">❌</div><div class="step-text">Не использовать изношенные или повреждённые круги</div></li>
+            <li class="step"><div class="step-num">👁️</div><div class="step-text">Не оставлять работающую машинку без присмотра</div></li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#f97316;">
+          <div class="card-title">🧪 Химические средства</div>
+          <ul class="steps">
+            <li class="step"><div class="step-num">😷</div><div class="step-text">Респиратор FFP2/FFP3 + очки + перчатки</div></li>
+            <li class="step"><div class="step-num">🌬️</div><div class="step-text">Только в проветриваемом помещении</div></li>
+            <li class="step"><div class="step-num">❌</div><div class="step-text">НИКОГДА не смешивать разные средства!</div></li>
+            <li class="step"><div class="step-num">🚨</div><div class="step-text">Попало в глаза → сразу смыть водой + врач</div></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="--card-accent:#3b82f6;">
+        <div class="card-title">✅ Чек-лист безопасности перед работой</div>
+        <div class="success">👤 Надел перчатки, очки, маску. Фильтры исправны</div>
+        <div class="success">⚙️ Осмотрел машинку — нет трещин, кабель цел</div>
+        <div class="success">🧪 Флаконы закрыты, помещение проветривается</div>
+        <div class="success">🏠 Полы чистые, острые инструменты убраны</div>
+        <div class="success">👥 Определён ответственный за инструмент</div>
+        <div class="success">📋 Согласован фронт работ с администратором</div>
+      </div>
+    </div>
+
+    <!-- ОБОРУДОВАНИЕ -->
+    <div class="pane" id="p-oborud">
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#ef4444;">
+          <div class="card-title">🔴 Расходные материалы</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🟢</span>Войлочные круги 125/75 мм, белый поролон</li>
+            <li class="rule-item"><span class="rule-icon">🔴</span>Mirka Abralon P180, P360, P500, P1000 (Ø150)</li>
+            <li class="rule-item"><span class="rule-icon">🎬</span>Лента Holex 24×50м · Jeta Pro 12×55м</li>
+            <li class="rule-item"><span class="rule-icon">🧻</span>Салфетки LARGE ROLL SEVEN 2-слойные 33×35см</li>
+            <li class="rule-item"><span class="rule-icon">🟦</span>Микрофибра 40×40 · Dry Monster</li>
+            <li class="rule-item"><span class="rule-icon">🎬</span>Плёнка BlackFox 10мкм, 5×150м</li>
+            <li class="rule-item"><span class="rule-icon">🧤</span>Перчатки нитриловые Shine Systems (50 пар, L)</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#3b82f6;">
+          <div class="card-title">⚙️ Профессиональное оборудование</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">⚙️</span>Машинка SEVEN ROTOR Ø150 — 17 990 ₽</li>
+            <li class="rule-item"><span class="rule-icon">📦</span>Подложки Leraton BPU150/BPS125</li>
+            <li class="rule-item"><span class="rule-icon">🔦</span>Фонарь Nordberg — 4 000 ₽</li>
+            <li class="rule-item"><span class="rule-icon">🌡️</span>Пирометр Kraftool TRM-380</li>
+            <li class="rule-item"><span class="rule-icon">🏗️</span>Стенд X-образный SEVEN S1N</li>
+            <li class="rule-item"><span class="rule-icon">🔧</span>Съёмник дворников Jonnesway</li>
+            <li class="rule-item"><span class="rule-icon">💦</span>Спрейер Kwazar Venus Pro+ 360, 2л</li>
+            <li class="rule-item"><span class="rule-icon">✂️</span>Нож OLFA SAC-1 (нержавейка)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:#f59e0b;">
+          <div class="card-title">🛡️ СИЗ</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">😷</span>Полумаска Jeta J-SET 6500 размер M. Фильтры 1–2 мес</li>
+            <li class="rule-item"><span class="rule-icon">🧤</span>Перчатки нитриловые Shine Systems</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:#8b5cf6;">
+          <div class="card-title">💧 Антидождь AQUA STOP SEVEN</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">📦</span>50 мл — 2 015 ₽</li>
+            <li class="rule-item"><span class="rule-icon">🔄</span>Ресурс: 10–15 авто на флакон</li>
+            <li class="rule-item"><span class="rule-icon">🎯</span>Аппликатор + микрофибра Dry Monster</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<!-- КНОПКА НАВЕРХ -->
+<div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<nav class="bnav">
+  <button class="bnav-btn active" id="nav-all" onclick="filterGroup('all',this)">
+    <span class="bnav-icon">📚</span>Все
+  </button>
+  <button class="bnav-btn" id="nav-teoria" onclick="filterGroup('teoria',this)">
+    <span class="bnav-icon">🎓</span>Теория
+  </button>
+  <button class="bnav-btn" id="nav-auto" onclick="filterGroup('auto',this)">
+    <span class="bnav-icon">🚗</span>Авто
+  </button>
+  <button class="bnav-btn" id="nav-remont" onclick="filterGroup('remont',this)">
+    <span class="bnav-icon">🔧</span>Ремонт
+  </button>
+  <button class="bnav-btn" id="nav-other" onclick="filterGroup('other',this)">
+    <span class="bnav-icon">✨</span>Другие
+  </button>
+  <button class="bnav-btn" id="nav-biznes" onclick="filterGroup('biznes',this)">
+    <span class="bnav-icon">💼</span>Бизнес
+  </button>
+</nav>
+
+<script>
+function toggleSection(id) {
+  const s = document.getElementById(id);
+  s.classList.toggle('open');
+}
+
+function showPane(groupId, paneId, btn) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  group.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function filterGroup(group, btn) {
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(s => {
+    if (group === 'all') {
+      s.style.display = '';
+    } else {
+      s.style.display = s.dataset.group === group ? '' : 'none';
+    }
+  });
+  // Если фильтр — раскрываем нужную секцию
+  if (group !== 'all') {
+    const target = document.querySelector(`.section[data-group="${group}"]`);
+    if (target && !target.classList.contains('open')) {
+      target.classList.add('open');
+    }
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Поиск
+function doSearch(q) {
+  const s = document.getElementById('search');
+  if (!q.trim()) {
+    document.querySelectorAll('.section').forEach(sec => sec.style.display = '');
+    return;
+  }
+  const ql = q.toLowerCase();
+  document.querySelectorAll('.section').forEach(sec => {
+    const text = sec.textContent.toLowerCase();
+    if (text.includes(ql)) {
+      sec.style.display = '';
+      if (!sec.classList.contains('open')) sec.classList.add('open');
+    } else {
+      sec.style.display = 'none';
+    }
+  });
+}
+
+// Scroll top
+window.addEventListener('scroll', () => {
+  const st = document.getElementById('scroll-top');
+  st.classList.toggle('show', window.scrollY > 300);
+});
+
+// Антидождь в отдельную группу нижней навигации (скрытая но открывается из "Все")
+</script>
+</body>
+</html>
