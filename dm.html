@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ДМ Обучение">
+<title>kari · Обучение директора магазина</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --red:#C0001A; --bg:#F4F4F6; --panel:#fff;
+  --border:#E4E4E8; --text:#1A1A2E; --muted:#888; --sub:#555;
+  --green:#1B7A3E; --green-bg:#E8F5EE; --green-border:#A7D7BC;
+  --amber:#B45309; --amber-bg:#FEF3C7; --amber-border:#FCD34D;
+  --blue:#1D4ED8; --blue-bg:#EFF6FF; --blue-border:#BFDBFE;
+  --red-bg:#FEE2E2; --red-border:#FCA5A5;
+  --purple:#7C3AED; --purple-bg:#F5F3FF; --purple-border:#C4B5FD;
+  --nav-h:58px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;padding-bottom:calc(var(--nav-h)+16px);}
+
+/* HEADER */
+.hdr{background:var(--red);padding:12px 16px 10px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:4px;}
+.logo-sub{font-size:9px;color:rgba(255,255,255,0.75);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.hdr-badge{margin-left:auto;background:rgba(255,255,255,0.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+
+/* SEARCH */
+.search-wrap{background:#fff;border-bottom:1px solid var(--border);padding:10px 14px;position:sticky;top:55px;z-index:99;}
+.search-icon-pos{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;}
+.search-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 32px;font-family:'Manrope',sans-serif;font-size:13px;border-radius:8px;outline:none;}
+.search-input:focus{border-color:var(--red);}
+
+/* CONTENT */
+.content{padding:12px 14px;}
+
+/* SECTION */
+.section{scroll-margin-top:110px;margin-bottom:8px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff;}
+.section-hdr{display:flex;align-items:center;padding:12px 14px;cursor:pointer;background:#fff;gap:10px;user-select:none;}
+.section-hdr:active{background:#FFF5F5;}
+.section-icon{font-size:20px;flex-shrink:0;}
+.section-title{font-size:14px;font-weight:800;flex:1;color:var(--text);}
+.section-count{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;background:var(--bg);padding:2px 7px;border-radius:10px;}
+.section-arrow{color:var(--muted);font-size:16px;transition:transform 0.2s;flex-shrink:0;}
+.section.open .section-arrow{transform:rotate(90deg);}
+.section-body{display:none;border-top:1px solid var(--border);}
+.section.open .section-body{display:block;}
+
+/* TAB PILLS */
+.tab-pills{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--bg);}
+.pill-btn{background:#fff;border:1px solid var(--border);color:var(--muted);padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Manrope',sans-serif;transition:all 0.15s;}
+.pill-btn.active{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+/* PANE */
+.pane{display:none;padding:12px;animation:fadeIn 0.2s ease;}
+.pane.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;margin-bottom:10px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--card-accent,var(--red));}
+.card-title{font-weight:800;font-size:13px;margin-bottom:9px;padding-left:4px;color:var(--text);}
+
+/* GRIDS */
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px;}
+@media(min-width:520px){.grid.g2{grid-template-columns:1fr 1fr}.grid.g3{grid-template-columns:1fr 1fr 1fr}}
+
+/* STEPS */
+.steps{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.step{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5;}
+.step-num{min-width:22px;height:22px;background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.step-text{color:var(--sub);padding-top:2px;}
+.step-text strong{color:var(--text);}
+
+/* RULE LIST */
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.rule-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--sub);line-height:1.5;}
+.rule-icon{flex-shrink:0;width:18px;text-align:center;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px;}
+.tbl th{background:var(--text);color:#fff;text-align:left;padding:7px 9px;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+.tbl td{padding:6px 9px;border-bottom:1px solid var(--border);color:var(--sub);vertical-align:top;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:nth-child(even) td{background:#FAFAFA;}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ALERTS */
+.warn{background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C;margin-top:8px;line-height:1.5;}
+.info{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--blue);margin-top:8px;line-height:1.5;}
+.success{background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--green);margin-top:8px;line-height:1.5;}
+.note{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--amber);margin-top:8px;line-height:1.5;}
+
+/* FORMULA BOX */
+.formula{background:var(--text);color:#fff;border-radius:8px;padding:12px 14px;text-align:center;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;letter-spacing:1px;}
+.formula-red{background:var(--red);}
+
+/* STAT BOXES */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.stat-box{background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--border);}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--text);}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.stat-val.red{color:var(--red);}
+.stat-val.green{color:var(--green);}
+.stat-val.amber{color:var(--amber);}
+
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+.tag{padding:2px 8px;font-size:10px;font-weight:700;border-radius:20px;}
+.tag-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.tag-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.tag-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.tag-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);}
+.tag-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);}
+
+/* COMPARE CARD */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.cmp-col{background:#fff;padding:10px 12px;}
+.cmp-head{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.cmp-head.green{color:var(--green);}
+.cmp-head.red{color:var(--red);}
+.cmp-item{font-size:12px;color:var(--sub);padding:3px 0;border-bottom:1px solid var(--border);line-height:1.4;}
+.cmp-item:last-child{border-bottom:none;}
+
+/* BRAND CARD */
+.brand-card{border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid;}
+.brand-kari{background:#FFF0F2;border-color:#FCA5A5;}
+.brand-pierre{background:#FFF8F0;border-color:#FCD34D;}
+.brand-taccardi{background:#F0F9FF;border-color:#BFDBFE;}
+.brand-timejump{background:#F0FDF4;border-color:#86EFAC;}
+.brand-name{font-weight:800;font-size:13px;margin-bottom:5px;}
+
+/* CHECKLIST */
+.checklist{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.check-item{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--sub);line-height:1.5;}
+.check-box{width:16px;height:16px;border-radius:4px;background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;}
+.check-box.bad{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0;}
+
+/* SCORE FORMULA */
+.score-formula{background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:8px;padding:12px;margin-bottom:10px;text-align:center;}
+.score-formula-text{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--purple);}
+.score-formula-desc{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(255,255,255,0.97);border-top:2px solid var(--border);display:flex;align-items:stretch;z-index:200;backdrop-filter:blur(10px);}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:'Manrope',sans-serif;font-size:8px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;transition:color 0.15s;padding:4px 2px;}
+.bnav-btn.active{color:var(--red);}
+.bnav-btn.active .bnav-icon{background:var(--red-bg);}
+.bnav-icon{font-size:18px;line-height:1;width:34px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background 0.15s;}
+
+/* SCROLL TOP */
+.scroll-top{position:fixed;bottom:calc(var(--nav-h)+12px);right:14px;background:var(--red);color:#fff;width:36px;height:36px;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:16px;z-index:150;box-shadow:0 2px 10px rgba(192,0,26,0.3);}
+.scroll-top.show{display:flex;}
+
+/* DAYS PLAN */
+.day-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);}
+.day-row:last-child{border-bottom:none;}
+.day-num{width:42px;height:42px;border-radius:8px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0;text-align:center;line-height:1.2;}
+.day-info{flex:1;}
+.day-title{font-weight:700;font-size:12px;color:var(--text);}
+.day-desc{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="logo">kari</div>
+    <div class="logo-sub">Обучение директора магазина</div>
+  </div>
+  <div class="hdr-badge">7 блоков</div>
+</header>
+
+<div class="search-wrap">
+  <span class="search-icon-pos">🔍</span>
+  <input class="search-input" type="text" placeholder="Поиск по обучению..." id="search" oninput="doSearch(this.value)">
+</div>
+
+<div class="content" id="main-content" style="padding-top:4px;">
+
+<!-- ═══════════ БЛОК 1: О КОМПАНИИ ═══════════ -->
+<div class="section open" id="g-company" data-group="company">
+  <div class="section-hdr" onclick="toggleSection('g-company')">
+    <span class="section-icon">🏢</span>
+    <span class="section-title">О компании kari</span>
+    <span class="section-count">Введение</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="pane active" id="p-company">
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🏆 kari — кто мы</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">👟</span>Одна из ведущих розничных сетей обуви и аксессуаров России</li>
+          <li class="rule-item"><span class="rule-icon">🏪</span>900+ магазинов в России и СНГ</li>
+          <li class="rule-item"><span class="rule-icon">📅</span>Собственный бренд kari основан в 2012 году</li>
+          <li class="rule-item"><span class="rule-icon">🌍</span>Официальный представитель Pierre Cardin в России</li>
+          <li class="rule-item"><span class="rule-icon">🎓</span>Учебный портал: <strong>edu.kari.com</strong></li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📅 Твой план первых 30 дней</div>
+        <div class="day-row">
+          <div class="day-num">1–2</div>
+          <div class="day-info"><div class="day-title">Знакомство</div><div class="day-desc">Команда, магазин, учебный портал edu.kari.com</div></div>
+        </div>
+        <div class="day-row">
+          <div class="day-num">3–5</div>
+          <div class="day-info"><div class="day-title">Стандарты</div><div class="day-desc">Внешний вид сотрудников, базовые правила работы</div></div>
+        </div>
+        <div class="day-row">
+          <div class="day-num">6–10</div>
+          <div class="day-info"><div class="day-title">Стажёр</div><div class="day-desc">Адресное хранение, работа с ТСД, визуальный контроль</div></div>
+        </div>
+        <div class="day-row">
+          <div class="day-num">11–14</div>
+          <div class="day-info"><div class="day-title">Касса</div><div class="day-desc">Авторизация, чеки, правила безопасности кассира</div></div>
+        </div>
+        <div class="day-row">
+          <div class="day-num">15–30</div>
+          <div class="day-info"><div class="day-title">Самостоятельная работа</div><div class="day-desc">Продажи, закрытие дня, отчёты под наставничеством</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">📚 Обязательные видео для нового ДМ</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">▶️</span>Добро пожаловать в компанию kari</li>
+          <li class="rule-item"><span class="rule-icon">▶️</span>Как работает магазин kari?</li>
+          <li class="rule-item"><span class="rule-icon">▶️</span>Зачем нужно адресное хранение?</li>
+          <li class="rule-item"><span class="rule-icon">▶️</span>Оформление адресного хранения</li>
+          <li class="rule-item"><span class="rule-icon">▶️</span>Визуальный контроль</li>
+          <li class="rule-item"><span class="rule-icon">▶️</span>Контроль с помощью ТСД</li>
+          <li class="rule-item"><span class="rule-icon">🎬</span>Плейлист «Приёмка товара» — 8 видео</li>
+        </ul>
+        <div class="info">💡 Все видео на edu.kari.com → YouKari</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">📋 Ключевые ресурсы</div>
+        <table class="tbl">
+          <tr><th>Ресурс</th><th>Где найти</th></tr>
+          <tr><td>Учебный портал</td><td>edu.kari.com</td></tr>
+          <tr><td>Service Desk</td><td>Личный кабинет → Service Desk</td></tr>
+          <tr><td>База знаний</td><td>edu.kari.com → «База знаний»</td></tr>
+          <tr><td>Видео-обучение</td><td>YouKari на главной странице</td></tr>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 2: ПОКАЗАТЕЛИ И ТО ═══════════ -->
+<div class="section" id="g-kpi" data-group="kpi">
+  <div class="section-hdr" onclick="toggleSection('g-kpi')">
+    <span class="section-icon">📊</span>
+    <span class="section-title">Показатели и формулы ТО</span>
+    <span class="section-count">Формула роста</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-kpi','p-formuly',this)">📐 Формулы</button>
+      <button class="pill-btn" onclick="showPane('g-kpi','p-primer',this)">💡 Пример роста</button>
+      <button class="pill-btn" onclick="showPane('g-kpi','p-vliyanie',this)">🎯 На что влияет ДМ</button>
+    </div>
+
+    <div class="pane active" id="p-formuly">
+      <div class="formula formula-red">ТО = ТРАФ × КОП × ШтВЧек × СрПок</div>
+
+      <div class="grid g2">
+        <div class="card" style="--card-accent:var(--blue);">
+          <div class="card-title">📈 Количественные</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">👥</span><strong>ТРАФ</strong> — кол-во посетителей</li>
+            <li class="rule-item"><span class="rule-icon">📦</span><strong>КолТов</strong> — кол-во товаров</li>
+            <li class="rule-item"><span class="rule-icon">🧾</span><strong>КолЧек</strong> — кол-во чеков</li>
+            <li class="rule-item"><span class="rule-icon">💰</span><strong>ТО</strong> — товарооборот</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:var(--green);">
+          <div class="card-title">📉 Качественные</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">🎯</span><strong>КОП</strong> — конверсия</li>
+            <li class="rule-item"><span class="rule-icon">💳</span><strong>СрЧек</strong> — средний чек</li>
+            <li class="rule-item"><span class="rule-icon">🛍️</span><strong>СрПок</strong> — средняя покупка</li>
+            <li class="rule-item"><span class="rule-icon">📊</span><strong>ШтВЧек</strong> — штук в чеке</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🧮 Формулы расчёта</div>
+        <table class="tbl">
+          <tr><th>Показатель</th><th>Формула</th><th>Пример</th></tr>
+          <tr><td><strong>КОП</strong></td><td>Чеки ÷ Трафик × 100%</td><td>200 ÷ 500 × 100 = 40%</td></tr>
+          <tr><td><strong>СрЧек</strong></td><td>ТО ÷ Кол-во чеков</td><td>100 000 ÷ 200 = 500 ₽</td></tr>
+          <tr><td><strong>СрПок</strong></td><td>ТО ÷ Кол-во товаров</td><td>100 000 ÷ 400 = 250 ₽</td></tr>
+          <tr><td><strong>ШтВЧек</strong></td><td>Товаров ÷ Чеки</td><td>400 ÷ 200 = 2 шт</td></tr>
+        </table>
+        <div class="note">⚡ Мультипликатор: показатели УМНОЖАЮТСЯ! КОП +10% + ШтВЧек +15% → СрЧек вырастет на 27%!</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-primer">
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">📌 Пример — магазин 10187</div>
+        <div class="info">Текущий ТО: 100 000 ₽ · КОП: 20% · СрЧек: 2 200 ₽ · Трафик ≈ 227 чел.</div>
+        <div class="divider"></div>
+        <table class="tbl">
+          <tr><th>Изменение</th><th>Новый ТО</th><th>Эффект</th></tr>
+          <tr><td>СрЧек +200 ₽ (→ 2 400 ₽)</td><td>108 960 ₽</td><td style="color:var(--green);font-weight:700;">+9%</td></tr>
+          <tr><td>КОП +2% (→ 22%)</td><td>109 868 ₽</td><td style="color:var(--green);font-weight:700;">+9.9%</td></tr>
+          <tr><td><strong>Оба показателя</strong></td><td><strong>119 856 ₽</strong></td><td style="color:var(--red);font-weight:700;">🔥 +19.9%!</td></tr>
+        </table>
+        <div class="success">✅ При плане 80% → улучшение обоих показателей ежедневно = выход на 100% плана</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">📐 Прирост к периоду</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🔍</span><strong>Найти прошлое:</strong> текущее ÷ (1 + прирост%). Пример: СЧ 1 000 ₽, рост +20% → прошлый = 1 000 ÷ 1.2 = 833 ₽</li>
+          <li class="rule-item"><span class="rule-icon">🔍</span><strong>Найти нужное:</strong> прошлое × (1 + прирост%). Пример: КОП 18%, план +20% → нужный = 18% × 1.2 = 21.6%</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--purple);">
+        <div class="card-title">🧠 Вопросы для планёрок</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">❓</span>Трафик 500 чел., КОП 14% — сколько купило? <strong>(Ответ: 70)</strong></li>
+          <li class="rule-item"><span class="rule-icon">❓</span>СЧ 1 200 ₽, рост к году +15% — каким был СЧ год назад? <strong>(Ответ: ≈1 043 ₽)</strong></li>
+          <li class="rule-item"><span class="rule-icon">❓</span>ТО упал на 10%, трафик вырос на 5% — что именно просело?</li>
+          <li class="rule-item"><span class="rule-icon">❓</span>Трафик 500, КОП 20%, нужный ТО 120 000 ₽ — какой нужен СЧ? <strong>(Ответ: 1 200 ₽)</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-vliyanie">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🎯 На что ДМ влияет напрямую</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">📈</span><strong>КОП</strong> — управляй работой консультантов у входа и в зале</li>
+          <li class="rule-item"><span class="rule-icon">🛍️</span><strong>ШтВЧек</strong> — обучай команду допродажам и комплектам</li>
+          <li class="rule-item"><span class="rule-icon">💎</span><strong>СрПок</strong> — мотивируй продавать дороже (кожа vs кожзам, новая коллекция vs распродажа)</li>
+          <li class="rule-item"><span class="rule-icon">🏪</span><strong>Трафик</strong> — зависит от локации и маркетинга, но мерчендайзинг и витрина влияют на конверсию</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">💡 Принцип «разреза слона»</div>
+        <p style="font-size:12.5px;color:var(--sub);line-height:1.6;margin-bottom:8px;">Большую цель магазина делим на маленькие персональные задачи каждого. Каждый выполнил своё — магазин сделал план.</p>
+        <div class="info">🐘 Чтобы съесть слона — нужно разделить его на части</div>
+        <div class="divider"></div>
+        <div class="card-title" style="font-size:12px;">Формат задачи</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">👤</span>Имя и должность</li>
+          <li class="rule-item"><span class="rule-icon">📊</span>Конкретные цифры: доля %, штуки, сумма в рублях</li>
+          <li class="rule-item"><span class="rule-icon">⏰</span>Срок выполнения</li>
+          <li class="rule-item"><span class="rule-icon">📸</span>Формат отчёта: фото + комментарий в группе</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Цель / Факт в конце смены</li>
+        </ul>
+        <div class="formula" style="font-size:11px;padding:10px;">Имя + Должность + Что продать + Сколько / На сколько ₽ + Отчёт</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 3: УПРАВЛЕНИЕ СМЕНОЙ ═══════════ -->
+<div class="section" id="g-smena" data-group="smena">
+  <div class="section-hdr" onclick="toggleSection('g-smena')">
+    <span class="section-icon">⚙️</span>
+    <span class="section-title">Управление сменой и командой</span>
+    <span class="section-count">Алгоритм · KPI · Оценка</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-smena','p-algoritm',this)">📋 Алгоритм</button>
+      <button class="pill-btn" onclick="showPane('g-smena','p-zadachi',this)">🎯 Задачи на выходные</button>
+      <button class="pill-btn" onclick="showPane('g-smena','p-ballы',this)">⭐ Система баллов</button>
+    </div>
+
+    <div class="pane active" id="p-algoritm">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔄 Алгоритм управления сменой — не менять!</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Распределение по зонам</strong> — в начале смены каждый получает закреплённую зону. Без зоны — нет ответственности.</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Постановка задачи → Контроль → Оценка</strong> — описание задачи + тайминг → промежуточный контроль → итоговый приём → оценка в баллах.</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Приём зон в конце смены</strong> — ДМ принимает зону у каждого сотрудника лично.</div></li>
+        </ul>
+        <div class="warn">‼️ Если ставить баллы «от балды» — вы ДЕМОТИВИРУЕТЕ ЛУЧШИХ. Эффективный сотрудник понимает: зачем работать хорошо, если получу столько же, сколько Вася?</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">✅ Сдача зоны — что проверять</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Чистота на полке, коробки выровнены, артикулы не смешаны</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text">Все полупарки выставлены, стоят на своих местах. Коробка = полупарок</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">Шнурки завязаны и спрятаны внутрь, молния/застёжки застёгнуты. В полупарках нет мусора</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Проверяем последние пары — полупарки соответствуют</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Нижний накопитель подсортирован</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">Торцы подсортированы, наполнены следками, крючки полные</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Проверить наличие цен на всех выставочных полупарках</div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text">Проверить за стеллажами и под стеллажами на завалившиеся короба</div></li>
+          <li class="step"><div class="step-num">9</div><div class="step-text">Собрать мусор из пуфиков, почистить коврики, вымести под стеллажами</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-zadachi">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔥 KPI на выходные (пик трафика)</div>
+        <div class="note">У каждого сотрудника — чёткие цифровые KPI, не просто «работать»!</div>
+        <div class="divider"></div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-weight:800;font-size:12px;color:var(--text);margin-bottom:6px;">🧾 Кассир</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">•</span>2 установки рассрочки</li>
+            <li class="rule-item"><span class="rule-icon">•</span>1 лимит</li>
+            <li class="rule-item"><span class="rule-icon">•</span>10 пенок для обуви + 5 стелек</li>
+            <li class="rule-item"><span class="rule-icon">•</span>2 изделия ЮИ до 1 000 ₽ с кассы</li>
+          </ul>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:8px;">
+          <div style="font-weight:800;font-size:12px;color:var(--text);margin-bottom:6px;">🏃 Продавец в зале</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">•</span>5 установок рассрочки</li>
+            <li class="rule-item"><span class="rule-icon">•</span>2 лимита</li>
+            <li class="rule-item"><span class="rule-icon">•</span>Кожа 15 000 ₽ / НК Takardi 10 000 ₽ / Спорт 10 000 ₽</li>
+            <li class="rule-item"><span class="rule-icon">•</span>1 рассрочка ФИНМОЛЛ</li>
+          </ul>
+        </div>
+        <div class="info">💡 Почему разные задачи? Кассир добирает чек мелочью. Продавец в зале фокусируется на крупных продажах.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">⚠️ Правила постановки задач</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">❌</span>Никаких «просто стоять на кассе» — у всех есть цифры</li>
+          <li class="rule-item"><span class="rule-icon">✅</span>Задачи должны быть реальными — то, что можно сделать за смену</li>
+          <li class="rule-item"><span class="rule-icon">📊</span>Отчёт в конце дня: что выполнил, где недотянул, почему</li>
+          <li class="rule-item"><span class="rule-icon">🔢</span>Не «сделал/не сделал», а «сколько именно»</li>
+        </ul>
+        <div class="success">Маленькие цели каждого = большой результат магазина</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-ballы">
+      <div class="score-formula">
+        <div class="score-formula-text">Итог = (Сумма баллов ÷ Кол-во задач) × Часы работы</div>
+        <div class="score-formula-desc">Формула итогового балла сотрудника за смену</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--purple);">
+        <div class="card-title">📊 Пример: Василий, 8 часов</div>
+        <table class="tbl">
+          <tr><th>Задача</th><th>Время</th><th>Баллы</th></tr>
+          <tr><td>Порядок в сумках по регламенту</td><td>10:00–12:00</td><td>7</td></tr>
+          <tr><td>Зимние аксессуары по регламенту</td><td>12:00–15:00</td><td>10</td></tr>
+          <tr><td>Зона обуви + сдача отдела</td><td>15:00–18:00</td><td>8</td></tr>
+          <tr><td colspan="2"><strong>ИТОГО: 25 ÷ 3 × 8 =</strong></td><td><strong style="color:var(--purple);">66 баллов</strong></td></tr>
+        </table>
+        <div class="info">💡 Если сотрудник сделал больший объём и уложился — добавляй баллы за эффективность</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">✅ Правила системы оценки</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">⭐</span>Каждая задача оценивается в баллах</li>
+          <li class="rule-item"><span class="rule-icon">📸</span>Сотрудник отчитывается лично + фото/комментарий в группе</li>
+          <li class="rule-item"><span class="rule-icon">🌙</span>Вечером считаем итоговый балл за день</li>
+          <li class="rule-item"><span class="rule-icon">📊</span>По итогам видно сразу: кто эффективен, а кто нет</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 4: ПОРЯДОК В ОБУВИ ═══════════ -->
+<div class="section" id="g-poryadok" data-group="poryadok">
+  <div class="section-hdr" onclick="toggleSection('g-poryadok')">
+    <span class="section-icon">👟</span>
+    <span class="section-title">Порядок в обуви</span>
+    <span class="section-count">8 критериев · Размеры · Скорость</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-poryadok','p-kriterii',this)">📋 8 критериев</button>
+      <button class="pill-btn" onclick="showPane('g-poryadok','p-razmery',this)">📏 Правильный размер</button>
+      <button class="pill-btn" onclick="showPane('g-poryadok','p-algoritm-p',this)">⚡ Алгоритм скорости</button>
+    </div>
+
+    <div class="pane active" id="p-kriterii">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">✅ Что значит «порядок в обуви» — 8 критериев</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text">Выставлен полупарок <strong>КАЖДОЙ</strong> модели, включая полупарок последней пары</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>ВСЕ</strong> размеры, которые есть на остатке магазина, стоят за выставочным полупарком</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text">В артикуле <strong>нет коробок от другой модели</strong></div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Цена на каждом полупарке и коробке <strong>соответствует прайс-листу</strong></div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">У каждого артикула <strong>правильный адрес</strong></div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text">Группа в одном месте. <strong>Место соответствует сезону</strong></div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Обувь, коробки, полки — <strong>чистые</strong></div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text">Торец оформлен по бюллетеню, соответствует группе, <strong>торец полный</strong></div></li>
+        </ul>
+        <div class="warn">⚠️ Неправильный полупарок → неправильный ценник → пересорт → скандалы с клиентами. Цепочка начинается с одной ошибки!</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-razmery">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📏 Правила выставления полупарка по размерам</div>
+        <table class="tbl">
+          <tr><th>Тип обуви</th><th>Порядок размеров</th></tr>
+          <tr><td>👠 Женская</td><td>37 → 36, 35 → 38, 39, 40, 41</td></tr>
+          <tr><td>👞 Мужская</td><td>42 → 41, 40, 39 → 43, 44, 45</td></tr>
+          <tr><td>👟 Детская</td><td>Самый маленький размер</td></tr>
+        </table>
+        <div class="info">💡 Самый большой спрос у женщин — 37 размер, затем 36, 35. Поэтому они стоят первыми — примеряют с витрины, не разносят полку.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">📐 Размерная сетка EU / RU</div>
+        <table class="tbl">
+          <tr><th>Длина стопы</th><th>EU</th><th>RU</th></tr>
+          <tr><td>22,2 см</td><td>35</td><td>34</td></tr>
+          <tr><td>22,9 см</td><td>36</td><td>35</td></tr>
+          <tr><td>23,6 см</td><td>37</td><td>36</td></tr>
+          <tr><td>24,2 см</td><td>38</td><td>37</td></tr>
+          <tr><td>24,9 см</td><td>39</td><td>38</td></tr>
+          <tr><td>25,6 см</td><td>40</td><td>39</td></tr>
+          <tr><td>26,2 см</td><td>41</td><td>40</td></tr>
+          <tr><td>26,9 см</td><td>42</td><td>41</td></tr>
+          <tr><td>27,6 см</td><td>43</td><td>42</td></tr>
+          <tr><td>28,5 см</td><td>44</td><td>43</td></tr>
+        </table>
+        <div class="warn">⚠️ Мерять ногу лучше вечером — стопа «растаптывается» на 0,5–1 размер за день.</div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-algoritm-p">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">⚡ 7 правил скорости — договорись с каждым</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>НЕ ЗАВИСАЙ</strong> — 1-2 секунды не нашёл место, убери в сторону (на телегу)</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>ЗАШЁЛ В РЯД — не выходи</strong>, пока не закончил</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>НАЧИНАЙ С ВИЗУАЛЬНОГО</strong> порядка, скануй по чистому</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text">Исправь визуально ошибки: не тот полупарок, не та коробка, нет полупарка</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text">Ставь <strong>правильный размер</strong></div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>Сканируй по чистому</strong></div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text">Закончил группу — раскидай ошибки с телеги по адресу через приложение</div></li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">🔍 Алгоритм наведения визуального порядка</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">❶</span><strong>Полупарок не соответствует коробке:</strong> 1-2 сек ищешь место → не нашёл → на телегу</li>
+          <li class="rule-item"><span class="rule-icon">❷</span><strong>Лишняя коробка в артикуле:</strong> аналогично, на телегу</li>
+          <li class="rule-item"><span class="rule-icon">❸</span><strong>Нет полупарка:</strong> смотришь коробку выставочного размера → если нет нужного, берёшь следующий, выставляешь правый → если только левый — ставишь боком</li>
+        </ul>
+        <div class="info">💡 Сканирование: остаток × 5 сек ÷ 3600 ÷ 8 часов = человеко-смен. Максимум 3 человека в смену.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 5: КАССА И ЗАКРЫТИЕ ДНЯ ═══════════ -->
+<div class="section" id="g-kassa" data-group="kassa">
+  <div class="section-hdr" onclick="toggleSection('g-kassa')">
+    <span class="section-icon">💳</span>
+    <span class="section-title">Касса и закрытие дня</span>
+    <span class="section-count">Кассир · Лояльность · Закрытие</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-kassa','p-kassir',this)">🧾 Правила кассира</button>
+      <button class="pill-btn" onclick="showPane('g-kassa','p-loyalnost',this)">⭐ kari CLUB</button>
+      <button class="pill-btn" onclick="showPane('g-kassa','p-zakrytie',this)">🔒 Закрытие дня</button>
+    </div>
+
+    <div class="pane active" id="p-kassir">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔐 Правила безопасности кассира — никогда не нарушай</div>
+        <ul class="checklist">
+          <li class="check-item"><div class="check-box">✓</div><span>Ключ от денежного ящика — <strong>ВСЕГДА в сейфе</strong>, никогда не вставлен</span></li>
+          <li class="check-item"><div class="check-box">✓</div><span>Купюры 1 000 / 2 000 / 5 000 ₽ — <strong>ВСЕГДА через детектор</strong></span></li>
+          <li class="check-item"><div class="check-box">✓</div><span>В ящике не более <strong>50 000 ₽</strong> — при превышении изъятие в сейф</span></li>
+          <li class="check-item"><div class="check-box">✓</div><span>Каждая операция — <strong>ТОЛЬКО с чеком</strong> (нарушение = штраф)</span></li>
+          <li class="check-item"><div class="check-box bad">✗</div><span>Пробивать <strong>карту сотрудника</strong> при обслуживании покупателей</span></li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🛒 Чеклист кассира — 6 шагов</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Приветствие</strong> — улыбка, зрительный контакт, готовность помочь</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Добавление товара</strong> — сканируй ШК каждой позиции, проверяй цену</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Карта лояльности</strong> — предложи kari CLUB, считай бонусы покупателя</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text"><strong>Оплата</strong> — уточни способ оплаты, проведи транзакцию</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text"><strong>Чек</strong> — выдай чек (бумажный или электронный)</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>Прощание</strong> — поблагодари за покупку</div></li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">💳 Виды оплаты</div>
+        <div class="tags">
+          <span class="tag tag-green">Наличные</span>
+          <span class="tag tag-blue">Банковская карта</span>
+          <span class="tag tag-amber">Смешанная оплата</span>
+          <span class="tag tag-purple">Подарочный сертификат (макс. 3 в чеке)</span>
+          <span class="tag tag-red">Рассрочка ФИНМОЛЛ</span>
+          <span class="tag tag-green">Бонусы «Спасибо» Сбербанк</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-loyalnost">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⭐ Правило kari CLUB</div>
+        <div class="warn">📌 Общая скидка в одном чеке не может превышать <strong>30%</strong> (акции + бонусы суммируются)</div>
+        <table class="tbl" style="margin-top:10px;">
+          <tr><th>Размер скидки по акции</th><th>Можно списать бонусы?</th></tr>
+          <tr><td>≥ 30%</td><td>❌ Нет</td></tr>
+          <tr><td>&lt; 30%</td><td>✅ Да, но в сумме не более 30%</td></tr>
+          <tr><td>Распродажа 70%</td><td>✅ Да, до 30% от суммы после скидки</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-zakrytie">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🔒 Порядок закрытия дня — 7 шагов</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>X-ОТЧЁТ</strong> — распечатай → сверь сумму в ящике с данными отчёта</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>ЗАКРЫТИЕ СМЕНЫ</strong> — нажми «Закрыть смену» → система проводит изъятие</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Z-ОТЧЁТ</strong> — распечатай → проверь: нет строки «НАЛИЧНЫЕ В КАССЕ» с суммой</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text"><strong>СВЕРКА ИТОГОВ</strong> — распечатай сверку → сверь по всем кассам</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text"><strong>ИЗЪЯТИЕ В ГЛАВНУЮ КАССУ</strong> — перенеси наличные из ящиков</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>ПЕРЕСЧЁТ ДЕНЕГ</strong> — пересчитай все деньги в главной кассе</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text"><strong>КО-4</strong> — сформируй кассовую книгу</div></li>
+        </ul>
+      </div>
+
+      <div class="grid g2">
+        <div class="card" style="--card-accent:var(--green);">
+          <div class="card-title">✅ Z-отчёт: ОК</div>
+          <p style="font-size:12.5px;color:var(--sub);">Видишь строку <strong>«ИНКАССАЦИЯ»</strong> → автоматическое изъятие прошло успешно</p>
+        </div>
+        <div class="card" style="--card-accent:var(--red);">
+          <div class="card-title">❌ Z-отчёт: ОШИБКА</div>
+          <p style="font-size:12.5px;color:var(--sub);">Видишь <strong>«НАЛИЧНЫЕ В КАССЕ»</strong> → изъятие НЕ прошло → изъять вручную + Service Desk</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 6: ПРОДАЖИ И ПРОДУКТ ═══════════ -->
+<div class="section" id="g-sales" data-group="sales">
+  <div class="section-hdr" onclick="toggleSection('g-sales')">
+    <span class="section-icon">🛍️</span>
+    <span class="section-title">Продажи и продукт</span>
+    <span class="section-count">5 этапов · Бренды · Материалы</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-sales','p-etapy',this)">🎯 5 этапов</button>
+      <button class="pill-btn" onclick="showPane('g-sales','p-vozrazheniya',this)">💬 Возражения</button>
+      <button class="pill-btn" onclick="showPane('g-sales','p-brendy',this)">🏷️ Бренды</button>
+      <button class="pill-btn" onclick="showPane('g-sales','p-materialy',this)">🧵 Материалы</button>
+    </div>
+
+    <div class="pane active" id="p-etapy">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">1️⃣ КОНТАКТ — первые 30 секунд</div>
+        <div class="cmp">
+          <div class="cmp-col">
+            <div class="cmp-head red">✗ Не говори</div>
+            <div class="cmp-item">«Вам помочь?»</div>
+            <div class="cmp-item">«Что вам нужно?»</div>
+            <div class="cmp-item">Молчи в углу</div>
+          </div>
+          <div class="cmp-col">
+            <div class="cmp-head green">✓ Говори</div>
+            <div class="cmp-item">«Добрый день! Ищете что-то конкретное или смотрите новинки?»</div>
+            <div class="cmp-item">«У нас поступила новая коллекция — хотите покажу?»</div>
+            <div class="cmp-item">Будь рядом, но не нависай</div>
+          </div>
+        </div>
+        <div class="info">💡 Правило 30 секунд: улыбнись и поздоровайся → дай 1-2 мин осмотреться → только потом подходи</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">2️⃣ ПОТРЕБНОСТИ — задай вопросы</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">❓</span>Для чего: каждый день / работа / праздник / спорт?</li>
+          <li class="rule-item"><span class="rule-icon">❓</span>Материал: кожа / замша / текстиль?</li>
+          <li class="rule-item"><span class="rule-icon">❓</span>Каблук, подошва, полнота стопы?</li>
+          <li class="rule-item"><span class="rule-icon">❓</span>Бюджет? — подбери 2–3 варианта</li>
+        </ul>
+        <div class="divider"></div>
+        <table class="tbl">
+          <tr><th>Что услышал</th><th>Что предлагаешь</th></tr>
+          <tr><td>«На работу, много хожу»</td><td>Анатомическая стелька, ТЭП-подошва, кожа — Alessio Nesca</td></tr>
+          <tr><td>«На праздник»</td><td>Pierre Cardin, модельные туфли, лаковая кожа</td></tr>
+          <tr><td>«Каждый день, бюджетно»</td><td>T.Taccardi, kari — кожа или экокожа</td></tr>
+          <tr><td>«Спорт, активность»</td><td>TimeJump — кроссовки, дышащие материалы</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">3️⃣ ПРЕЗЕНТАЦИЯ — Свойство → Преимущество → Выгода</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🐄</span><strong>Кожа телячья</strong> → «Мягкая, дышит, разносится под вашу ногу с первого дня»</li>
+          <li class="rule-item"><span class="rule-icon">❄️</span><strong>Подошва ТЭП</strong> → «Не замерзает до -50°, нога не устаёт»</li>
+          <li class="rule-item"><span class="rule-icon">🛡️</span><strong>Гарантия 180 дней</strong> → «Если заводской брак — обменяем»</li>
+          <li class="rule-item"><span class="rule-icon">💳</span><strong>Рассрочка без переплат</strong> → «Берите сейчас, платите частями»</li>
+          <li class="rule-item"><span class="rule-icon">⭐</span><strong>Бонусы kari до 30%</strong> → «Часть вернётся бонусами»</li>
+        </ul>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">5️⃣ ЗАКРЫТИЕ + ДОПРОДАЖА</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">✅</span>«Будем упаковывать? Оформлю на кассе»</li>
+          <li class="rule-item"><span class="rule-icon">🧴</span>Предложи уход: крем / спрей / стельки — «продлит жизнь обуви в 2 раза»</li>
+          <li class="rule-item"><span class="rule-icon">👜</span>Предложи аксессуар: ремень / сумку / носки в тон</li>
+          <li class="rule-item"><span class="rule-icon">⭐</span>«Оформить карту лояльности? — уже с этой покупки начнут копиться бонусы»</li>
+        </ul>
+        <div class="success">💡 Допродажа — это не навязывание, это забота. Средство по уходу — клиент скажет «спасибо» через месяц.</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--purple);">
+        <div class="card-title">📋 Памятка продавца — всегда/никогда</div>
+        <div class="cmp">
+          <div class="cmp-col">
+            <div class="cmp-head green">✅ Всегда делай</div>
+            <div class="cmp-item">Улыбайся первым</div>
+            <div class="cmp-item">Задавай вопросы о потребностях</div>
+            <div class="cmp-item">Предлагай 2–3 варианта</div>
+            <div class="cmp-item">Говори о выгодах</div>
+            <div class="cmp-item">Рассказывай о рассрочке</div>
+            <div class="cmp-item">Оформляй карту лояльности</div>
+          </div>
+          <div class="cmp-col">
+            <div class="cmp-head red">❌ Никогда не делай</div>
+            <div class="cmp-item">Игнорировать на входе</div>
+            <div class="cmp-item">Сразу давить «Берёте?»</div>
+            <div class="cmp-item">Перегружать 10+ моделями</div>
+            <div class="cmp-item">«Подошва ТЭП» без объяснения</div>
+            <div class="cmp-item">Молчать об акциях</div>
+            <div class="cmp-item">Отпускать без допродажи</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-vozrazheniya">
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">💬 Схема работы с возражениями</div>
+        <div class="formula" style="font-size:12px;padding:10px;background:var(--amber);">ВЫСЛУШАЙ → ПРИСОЕДИНИСЬ → АРГУМЕНТ → УТОЧНИ</div>
+        <table class="tbl" style="margin-top:10px;">
+          <tr><th>Возражение</th><th>Правильный ответ</th></tr>
+          <tr><td>«Дорого»</td><td>«Понимаю. Здесь натуральная кожа и гарантия 180 дней. Есть рассрочка без переплат — выходит по X руб. в месяц»</td></tr>
+          <tr><td>«Я подумаю»</td><td>«Что именно вас смущает? Давайте я отвечу на вопросы прямо сейчас»</td></tr>
+          <tr><td>«Китай»</td><td>«Производство в Китае, но на современных фабриках с европейским контролем. Гарантия 180 дней тому подтверждение»</td></tr>
+          <tr><td>«Жмёт»</td><td>«Давайте примерим на полразмера больше или подберём модель с другой колодкой»</td></tr>
+          <tr><td>«Нет нужного цвета»</td><td>«Могу записать ваш контакт и сообщить, когда поступит. Или посмотрим похожую модель?»</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="pane" id="p-brendy">
+      <div class="brand-card brand-pierre">
+        <div class="brand-name">👑 PIERRE CARDIN — Премиум</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🇫🇷</span>Французский бренд, основан в 1950 году в Париже</li>
+          <li class="rule-item"><span class="rule-icon">🤝</span>kari — официальный представитель в России</li>
+          <li class="rule-item"><span class="rule-icon">🐄</span>Натуральная кожа (телячья, гладкая, лаковая), молнии YKK</li>
+          <li class="rule-item"><span class="rule-icon">👔</span>Кому: деловые люди, премиум-покупатели, подарок</li>
+        </ul>
+      </div>
+      <div class="brand-card brand-kari">
+        <div class="brand-name">🏪 KARI — Собственный бренд</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🇷🇺</span>Российский бренд, основан в 2012 году</li>
+          <li class="rule-item"><span class="rule-icon">👟</span>Три группы: comfort&casual / trend&classic / fashion&design</li>
+          <li class="rule-item"><span class="rule-icon">🐄</span>Натуральная кожа, замша, натуральные подкладки</li>
+          <li class="rule-item"><span class="rule-icon">👥</span>Кому: широкая аудитория, натуральные материалы по разумной цене</li>
+        </ul>
+      </div>
+      <div class="brand-card brand-taccardi">
+        <div class="brand-name">💫 T.TACCARDI — Стиль и доступность</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🇮🇹</span>Дизайн с итальянским дизайнером Эудженио Марраподи</li>
+          <li class="rule-item"><span class="rule-icon">🧵</span>Натуральная кожа (часть линеек) + экокожа — смотри ярлык!</li>
+          <li class="rule-item"><span class="rule-icon">👗</span>Основной фокус: женская обувь, 3 000+ наименований</li>
+          <li class="rule-item"><span class="rule-icon">👥</span>Кому: стильная обувь по доступной цене</li>
+        </ul>
+      </div>
+      <div class="brand-card brand-timejump">
+        <div class="brand-name">🏃 TIMEJUMP — Спорт</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">👟</span>Бренд kari для спорта и активного отдыха</li>
+          <li class="rule-item"><span class="rule-icon">🌬️</span>Текстиль дышащий, амортизирующая подошва</li>
+          <li class="rule-item"><span class="rule-icon">💰</span>Ценовой сегмент: эконом — демократичные цены</li>
+          <li class="rule-item"><span class="rule-icon">👥</span>Кому: спортсмены, активная молодёжь</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-materialy">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">🧵 Виды кожи — что говорить клиенту</div>
+        <table class="tbl">
+          <tr><th>Вид кожи</th><th>Что говорить клиенту</th></tr>
+          <tr><td>Натуральная гладкая</td><td>Прочная, долговечна, хорошо дышит. Лучший выбор на каждый день</td></tr>
+          <tr><td>Анилиновая</td><td>Элитная, с природным рисунком. Мягкая. Требует бережного ухода</td></tr>
+          <tr><td>Замша / велюр / нубук</td><td>Благородный вид, дышит. Носить в сухую погоду. Уход: пропитка + щётка</td></tr>
+          <tr><td>Лаковая кожа</td><td>Влагостойкая, эффектная. Не носить в сильный мороз</td></tr>
+          <tr><td>Экокожа</td><td>Износостойка, водонепроницаема. Нет пор — нога не дышит</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">👞 Материалы подошв</div>
+        <table class="tbl">
+          <tr><th>Материал</th><th>Главное преимущество</th></tr>
+          <tr><td><strong>Резина</strong></td><td>Износостойкая, не скользит</td></tr>
+          <tr><td><strong>ТЭП</strong></td><td>Не замерзает до -50°, поглощает удары, лёгкая</td></tr>
+          <tr><td><strong>ТРП</strong></td><td>Лёгкая, теплозащитная, снимает нагрузку с позвоночника</td></tr>
+          <tr><td><strong>ЭВА</strong></td><td>Сверхлёгкая, амортизирует — для детской и летней обуви</td></tr>
+          <tr><td><strong>Тунит</strong></td><td>Имитирует кожаную подошву, прочный</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">🧴 Уход за обувью — советуй клиенту</div>
+        <table class="tbl">
+          <tr><th>Материал</th><th>Уход</th></tr>
+          <tr><td>Гладкая кожа</td><td>Крем в тон, полировка. 1-2 раза в неделю при активной носке</td></tr>
+          <tr><td>Замша / велюр</td><td>Спрей-пропитка от влаги. Щётка для замши. Не под дождём</td></tr>
+          <tr><td>Лаковая кожа</td><td>Специальный крем для лака. Не в мороз — трескается</td></tr>
+          <tr><td>Экокожа</td><td>Влажная тряпочка. Средства для кожи тоже подходят</td></tr>
+          <tr><td>Текстиль / сникеры</td><td>Щётка и мягкое мыло. Сушить не у батареи</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ БЛОК 7: РАССРОЧКА И ВЫВОЗ ═══════════ -->
+<div class="section" id="g-finance" data-group="finance">
+  <div class="section-hdr" onclick="toggleSection('g-finance')">
+    <span class="section-icon">💰</span>
+    <span class="section-title">Рассрочка и вывоз брака</span>
+    <span class="section-count">4 вида · Скрипты · Брак</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-finance','p-vidy',this)">💳 Виды рассрочки</button>
+      <button class="pill-btn" onclick="showPane('g-finance','p-skripty',this)">🗣️ Скрипты продаж</button>
+      <button class="pill-btn" onclick="showPane('g-finance','p-brak',this)">📦 Вывоз брака</button>
+    </div>
+
+    <div class="pane active" id="p-vidy">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⚡ Сравнение всех видов рассрочки</div>
+        <div class="tbl-scroll">
+        <table class="tbl">
+          <tr><th>Вид</th><th>Срок</th><th>Взнос</th><th>Лимит</th><th>Акции</th></tr>
+          <tr><td><strong>ФИНМОЛЛ</strong></td><td>6 мес.</td><td>0%</td><td>70 000 ₽</td><td>❌</td></tr>
+          <tr><td><strong>КАРИ ЧАСТЯМИ</strong></td><td>2 мес.</td><td>25%</td><td>20 000 ₽</td><td>✅</td></tr>
+          <tr><td><strong>ЯНДЕКС СПЛИТ</strong></td><td>2 мес.</td><td>25%</td><td>60 000 ₽</td><td>✅</td></tr>
+          <tr><td><strong>ПЛАЙТ</strong></td><td>2 мес.</td><td>25%</td><td>60 000 ₽</td><td>✅</td></tr>
+        </table>
+        </div>
+        <div class="divider"></div>
+        <div class="card-title" style="font-size:12px;">Что выбрать в зависимости от ситуации</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">💡</span><strong>Мин. комиссия</strong> → ПЛАЙТ (1,6%) или Я.Сплит</li>
+          <li class="rule-item"><span class="rule-icon">💡</span><strong>Без паспорта</strong> → ПЛАЙТ, Я.Сплит или КАРИ ЧАСТЯМИ</li>
+          <li class="rule-item"><span class="rule-icon">💡</span><strong>Крупная сумма</strong> → ПЛАЙТ или Я.Сплит (до 60 000 ₽)</li>
+          <li class="rule-item"><span class="rule-icon">💡</span><strong>Деньги на р/с сразу</strong> → ПЛАЙТ или Я.Сплит (не ФИНМОЛЛ — там 70 дней!)</li>
+          <li class="rule-item"><span class="rule-icon">💡</span><strong>Совместить со скидкой</strong> → любой, кроме ФИНМОЛЛ</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-skripty">
+      <div class="card" style="--card-accent:var(--green);">
+        <div class="card-title">✅ Как правильно говорить</div>
+        <div class="cmp">
+          <div class="cmp-col">
+            <div class="cmp-head red">⛔ Не говори</div>
+            <div class="cmp-item">Рассрочка</div>
+            <div class="cmp-item">Лимит</div>
+            <div class="cmp-item">Одобренная сумма</div>
+          </div>
+          <div class="cmp-col">
+            <div class="cmp-head green">✅ Говори</div>
+            <div class="cmp-item">Оплата частями / новый способ оплаты</div>
+            <div class="cmp-item">Сумма на покупки</div>
+            <div class="cmp-item">Сумма на покупки</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--blue);">
+        <div class="card-title">🗣️ Скрипт на кассе — 3 шага</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Предложить:</strong> «Добрый день! У нас появился новый способ оплаты — оплата частями. Давайте заполним анкету и узнаем вашу сумму на покупки?»</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Получили СМС:</strong> «Замечательно! У вас сумма на покупки 10 000 ₽. Идите выбирайте — разделим на 3 или 6 частей, сегодня ничего платить не нужно!»</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Акцент на цену в месяц:</strong> «Кстати, эта пара стоит всего 1 000 ₽ в месяц! Первый платёж — только в следующем месяце, ни рубля переплаты.»</div></li>
+        </ul>
+        <div class="info">💡 Предлагай рассрочку даже тем, кто готов купить за наличные!</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">📊 Твой вклад в ТО через рассрочку</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">📅</span>Выходные: 8 дней × 6 расчётов = <strong>48 расчётов</strong></li>
+          <li class="rule-item"><span class="rule-icon">📅</span>Будние: 22 дня × 2 расчёта = <strong>44 расчёта</strong></li>
+          <li class="rule-item"><span class="rule-icon">💳</span>Итого: <strong>92 расчёта</strong> → возвращаются 70% = 65 покупателей</li>
+          <li class="rule-item"><span class="rule-icon">💰</span>СрЧек 6 000 ₽ × 65 = <strong>390 000 ₽ к обороту</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-brak">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📦 Схема подготовки короба к вывозу</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Удали старые ШК</strong> — убери или заклей все старые штрих-коды</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Упакуй товар</strong> — согласно виду брака (обувь, некомплект, аксессуары, ЮИ)</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Наклей стикер</strong> — новый ШК в правильное место</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text"><strong>Подпиши «БРАК»</strong> — маркером или листом А4</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text"><strong>Проверь оформление</strong> — фото-пример на портале</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>Согласуй с логистикой</strong> — дату и время забора</div></li>
+        </ul>
+        <div class="info">📋 Стикеры с ШК заказываются на edu.kari.com → Работа с товаром → Работа с браком</div>
+      </div>
+
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">📋 Какие короба использовать</div>
+        <table class="tbl">
+          <tr><th>Вид брака</th><th>Тип короба</th></tr>
+          <tr><td>Бракованная обувь</td><td>Стандартный короб kari</td></tr>
+          <tr><td>Обувь-некомплект</td><td>Стандартный короб kari (маркировка «некомплект»)</td></tr>
+          <tr><td>Бракованные аксессуары</td><td>Фабричный или возвратный короб</td></tr>
+          <tr><td>Ювелирные изделия</td><td>Специальный короб для ЮИ</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="g-priemka" data-group="priemka">
+  <div class="section-hdr" onclick="toggleSection('g-priemka')">
+    <span class="section-icon">📦</span>
+    <span class="section-title">Приёмка товара</span>
+    <span class="section-count">24 часа · Алгоритм · ТСД</span>
+    <span class="section-arrow">›</span>
+  </div>
+  <div class="section-body">
+    <div class="tab-pills">
+      <button class="pill-btn active" onclick="showPane('g-priemka','p-priemka-algo',this)">📋 Алгоритм</button>
+      <button class="pill-btn" onclick="showPane('g-priemka','p-priemka-vazh',this)">⚠️ Важное</button>
+    </div>
+
+    <div class="pane active" id="p-priemka-algo">
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">⏱️ Главное правило</div>
+        <div class="warn">📌 На приём товара даётся <strong>24 часа</strong>. Правильная и качественная приёмка — залог сохранности ТМЦ.</div>
+      </div>
+      <div class="card" style="--card-accent:var(--red);">
+        <div class="card-title">📋 Алгоритм приёмки — 9 шагов</div>
+        <ul class="steps">
+          <li class="step"><div class="step-num">1</div><div class="step-text"><strong>Приёмка по грузоместам</strong> — считаем коробки по накладной. Пока товар заносится, можно вскрывать коробки и осматривать внешне — экономит время на внутритарной проверке.</div></li>
+          <li class="step"><div class="step-num">2</div><div class="step-text"><strong>Интернет-заказы — первыми!</strong> Коробки с интернет-заказами (отмечены на ТСД) принимаются в первую очередь — их сразу отмечают на кассе как «найден».</div></li>
+          <li class="step"><div class="step-num">3</div><div class="step-text"><strong>Акт по грузоместам</strong> — формируется и подписывается в ТСД вместе с водителем + бумажные ТН. Все расхождения по местам обязательно указываются!</div></li>
+          <li class="step"><div class="step-num">4</div><div class="step-text"><strong>Внутритарная проверка</strong> — каждый товар внутри коробок. Проверяем количество и соответствие накладной.</div></li>
+          <li class="step"><div class="step-num">5</div><div class="step-text"><strong>Ценники и защита</strong> — ставятся на этапе приёмки. Товар едет в зоны только с ценами и защитой!</div></li>
+          <li class="step"><div class="step-num">6</div><div class="step-text"><strong>Развоз по зонам</strong> — принятый товар развозится на тележке, но не разбирается пока полностью не принята вся поставка.</div></li>
+          <li class="step"><div class="step-num">7</div><div class="step-text"><strong>Обувь — на малые телеги в проход</strong> — сразу с ценником в основной проход. Обувь уже может продаваться! Затем с телег на полки в свои группы.</div></li>
+          <li class="step"><div class="step-num">8</div><div class="step-text"><strong>Разбор по полкам</strong> — после полного принятия поставки сотрудники разбирают товар в своих зонах.</div></li>
+          <li class="step"><div class="step-num">9</div><div class="step-text"><strong>Выгрузка в ТСД</strong> — расхождения подтверждаются актом, прикреплённым в ax_work к своему заказу.</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pane" id="p-priemka-vazh">
+      <div class="card" style="--card-accent:var(--amber);">
+        <div class="card-title">⚡ Ключевые моменты</div>
+        <ul class="rule-list">
+          <li class="rule-item"><span class="rule-icon">🌐</span><strong>Интернет-заказы первыми</strong> — найди на ТСД, сразу отметь на кассе как «найден»</li>
+          <li class="rule-item"><span class="rule-icon">💰</span><strong>Товар едет в зоны только с ценой и защитой</strong></li>
+          <li class="rule-item"><span class="rule-icon">👟</span><strong>Обувь сразу на малые телеги с ценником</strong> — в основной проход, уже можно продавать</li>
+          <li class="rule-item"><span class="rule-icon">🚫</span><strong>Не разбирать до конца приёмки</strong> — товар ждёт пока не принята вся поставка</li>
+          <li class="rule-item"><span class="rule-icon">📝</span><strong>Акт с водителем</strong> — подписать в ТСД + бумажные ТН. Все расхождения обязательно указать</li>
+          <li class="rule-item"><span class="rule-icon">💻</span><strong>Расхождения в ax_work</strong> — акт прикрепляется к своему заказу</li>
+        </ul>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="--card-accent:var(--green);">
+          <div class="card-title">✅ Правильный порядок</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">1️⃣</span>По грузоместам</li>
+            <li class="rule-item"><span class="rule-icon">2️⃣</span>Интернет-заказы</li>
+            <li class="rule-item"><span class="rule-icon">3️⃣</span>Акт + ТН с водителем</li>
+            <li class="rule-item"><span class="rule-icon">4️⃣</span>Внутритарная проверка</li>
+            <li class="rule-item"><span class="rule-icon">5️⃣</span>Ценники + защита</li>
+            <li class="rule-item"><span class="rule-icon">6️⃣</span>Развоз по зонам</li>
+            <li class="rule-item"><span class="rule-icon">7️⃣</span>Обувь на телеги в проход</li>
+            <li class="rule-item"><span class="rule-icon">8️⃣</span>Разбор на полки</li>
+            <li class="rule-item"><span class="rule-icon">9️⃣</span>Выгрузка ТСД + ax_work</li>
+          </ul>
+        </div>
+        <div class="card" style="--card-accent:var(--red);">
+          <div class="card-title">❌ Частые ошибки</div>
+          <ul class="rule-list">
+            <li class="rule-item"><span class="rule-icon">✗</span>Разбирать до конца приёмки</li>
+            <li class="rule-item"><span class="rule-icon">✗</span>Везти товар без ценников</li>
+            <li class="rule-item"><span class="rule-icon">✗</span>Забыть интернет-заказы</li>
+            <li class="rule-item"><span class="rule-icon">✗</span>Не указать расхождения в акте</li>
+            <li class="rule-item"><span class="rule-icon">✗</span>Не подписать акт с водителем</li>
+            <li class="rule-item"><span class="rule-icon">✗</span>Превысить 24 часа</li>
+          </ul>
+        </div>
+      </div>
+      <div class="success">✅ Правильная и качественная приёмка — залог сохранности ТМЦ</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<div class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
+<nav class="bnav">
+  <button class="bnav-btn active" id="nav-all" onclick="filterGroup('all',this)">
+    <span class="bnav-icon">📚</span>Все
+  </button>
+  <button class="bnav-btn" id="nav-company" onclick="filterGroup('company',this)">
+    <span class="bnav-icon">🏢</span>О kari
+  </button>
+  <button class="bnav-btn" id="nav-kpi" onclick="filterGroup('kpi',this)">
+    <span class="bnav-icon">📊</span>ТО
+  </button>
+  <button class="bnav-btn" id="nav-smena" onclick="filterGroup('smena',this)">
+    <span class="bnav-icon">⚙️</span>Смена
+  </button>
+  <button class="bnav-btn" id="nav-sales" onclick="filterGroup('sales',this)">
+    <span class="bnav-icon">🛍️</span>Продажи
+  </button>
+  <button class="bnav-btn" id="nav-kassa" onclick="filterGroup('kassa',this)">
+    <span class="bnav-icon">💳</span>Касса
+  </button>
+</nav>
+
+<script>
+function toggleSection(id){
+  const s=document.getElementById(id);
+  s.classList.toggle('open');
+}
+
+function showPane(groupId,paneId,btn){
+  const group=document.getElementById(groupId);
+  group.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  group.querySelectorAll('.pill-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+  btn.classList.add('active');
+}
+
+function filterGroup(group,btn){
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>{
+    if(group==='all'){s.style.display='';}
+    else{s.style.display=s.dataset.group===group?'':'none';}
+  });
+  if(group!=='all'){
+    const t=document.querySelector(`.section[data-group="${group}"]`);
+    if(t&&!t.classList.contains('open'))t.classList.add('open');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function doSearch(q){
+  if(!q.trim()){
+    document.querySelectorAll('.section').forEach(s=>s.style.display='');
+    return;
+  }
+  const ql=q.toLowerCase();
+  document.querySelectorAll('.section').forEach(sec=>{
+    if(sec.textContent.toLowerCase().includes(ql)){
+      sec.style.display='';
+      if(!sec.classList.contains('open'))sec.classList.add('open');
+    }else{sec.style.display='none';}
+  });
+}
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('scroll-top').classList.toggle('show',window.scrollY>300);
+});
+</script>
+</body>
+</html>
