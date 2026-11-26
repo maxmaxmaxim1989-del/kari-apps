@@ -200,8 +200,8 @@ h1.title{font-size:28px;margin:4px 0 2px;text-wrap:balance}
   }
 
   var MAX_PHOTOS_PER_CAT = 4;
-  var PHOTO_MAX_SIDE = 1600;
-  var PHOTO_QUALITY = 0.75;
+  var PHOTO_MAX_SIDE = 1000;
+  var PHOTO_QUALITY = 0.5;
 
   function emptyClient(){
     var cats={};
@@ -225,7 +225,16 @@ h1.title{font-size:28px;margin:4px 0 2px;text-wrap:balance}
           var ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, cw, ch);
           try{
-            resolve(canvas.toDataURL("image/jpeg", PHOTO_QUALITY));
+            var q = PHOTO_QUALITY;
+            var out = canvas.toDataURL("image/jpeg", q);
+            var MAX_BYTES = 280000;
+            var tries = 0;
+            while(out.length*0.75 > MAX_BYTES && tries < 4){
+              q = q * 0.7;
+              out = canvas.toDataURL("image/jpeg", q);
+              tries++;
+            }
+            resolve(out);
           }catch(e){ reject(e); }
         };
         img.src = reader.result;
@@ -307,13 +316,16 @@ h1.title{font-size:28px;margin:4px 0 2px;text-wrap:balance}
         var sc = computeScore(c);
         var statusLabel = sc.answered===0 ? "Не начато" : (sc.answered<sc.total ? (sc.answered+"/"+sc.total+" пунктов") : (sc.pct+"%"));
         var chipClass = sc.answered===0 ? "" : (sc.answered<sc.total ? "" : scoreClass(sc.pct));
-        html += '<button class="client-item" data-open="'+c.id+'">'+
+        html += '<div class="client-item" data-open="'+c.id+'" style="cursor:pointer">'+
           '<span class="row" style="min-width:0"><span style="min-width:0;overflow:hidden">'+
           '<div class="name">'+esc(c.name||"Без названия")+'</div>'+
           '<div class="meta">'+esc(c.city||"—")+' · '+esc(c.package)+' · '+fmtDate(c.date)+'</div>'+
           '</span></span>'+
+          '<span class="row" style="flex:none;gap:8px">'+
           '<span class="chip '+chipClass+'">'+statusLabel+'</span>'+
-        '</button>';
+          '<button class="btn ghost" data-list-delete="'+c.id+'" style="color:var(--bad);padding:6px 8px" aria-label="Удалить">✕</button>'+
+          '</span>'+
+        '</div>';
       });
       html += '</div>';
     }
@@ -498,10 +510,24 @@ h1.title{font-size:28px;margin:4px 0 2px;text-wrap:balance}
     });
 
     app.querySelectorAll("[data-open]").forEach(function(el){
-      el.addEventListener("click", function(){
+      el.addEventListener("click", function(e){
+        if(e.target.closest("[data-list-delete]")) return;
         state.view="detail";
         state.currentId = el.getAttribute("data-open");
         render();
+      });
+    });
+
+    app.querySelectorAll("[data-list-delete]").forEach(function(btn){
+      btn.addEventListener("click", function(e){
+        e.stopPropagation();
+        var id = btn.getAttribute("data-list-delete");
+        var c = getClient(id);
+        var label = c ? (c.name||"Без названия") : "эту проверку";
+        if(window.confirm('Удалить проверку "'+label+'"? Это действие необратимо.')){
+          state.clients = state.clients.filter(function(x){ return x.id!==id; });
+          persist();
+        }
       });
     });
 
