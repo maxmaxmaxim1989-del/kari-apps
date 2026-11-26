@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Обход — чек-лист аудита магазина</title>
+<style>
+:root{
+  --bg:#f6f4ef;
+  --surface:#ffffff;
+  --ink:#1c1b17;
+  --muted:#6b6658;
+  --line:#e4e0d4;
+  --accent:#2f5d50;
+  --accent-ink:#f6f4ef;
+  --good:#2f5d50;
+  --warn:#9a6b1f;
+  --bad:#a4402f;
+  --chip-bg:#ece7d8;
+  --radius:14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#15140f;
+    --surface:#1f1e17;
+    --ink:#f1efe6;
+    --muted:#a6a08e;
+    --line:#332f24;
+    --accent:#6fae9b;
+    --accent-ink:#0e1a16;
+    --good:#6fae9b;
+    --warn:#d9a44e;
+    --bad:#e2816d;
+    --chip-bg:#262318;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3,.display{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding-block:24px 96px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1.title{font-size:28px;margin:4px 0 2px;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+.btn{
+  appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent;border-color:transparent;padding:10px 8px}
+.btn.block{width:100%;justify-content:center}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:10px;min-width:0}
+
+.client-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit;
+}
+.client-item .name{font-weight:700;font-size:15px}
+.client-item .meta{color:var(--muted);font-size:13px;margin-top:2px}
+.chip{
+  font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--chip-bg);color:var(--muted);
+  white-space:nowrap;flex:none;
+}
+.chip.score-good{background:color-mix(in srgb, var(--good) 20%, var(--chip-bg));color:var(--good)}
+.chip.score-warn{background:color-mix(in srgb, var(--warn) 22%, var(--chip-bg));color:var(--warn)}
+.chip.score-bad{background:color-mix(in srgb, var(--bad) 22%, var(--chip-bg));color:var(--bad)}
+
+.progress{height:8px;border-radius:999px;background:var(--chip-bg);overflow:hidden}
+.progress > div{height:100%;background:var(--accent);border-radius:999px;transition:width .25s}
+
+.client-head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.client-head .label{font-size:12px;color:var(--muted)}
+.pkg-tag{font-size:12px;font-weight:700;color:var(--accent)}
+
+.cat{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:10px}
+.cat.excluded{opacity:.5}
+.cat-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cat-top h3{font-size:15px;margin:0;min-width:0}
+.cat-weight{font-size:12px;color:var(--muted);white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
+.cat-desc{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.cat-excl-note{font-size:12px;color:var(--muted);font-style:italic}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{
+  flex:1 1 90px;min-width:0;padding:9px 8px;border-radius:9px;border:1px solid var(--line);
+  background:var(--chip-bg);color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+}
+.seg button.on.ok{background:var(--good);color:var(--accent-ink);border-color:var(--good)}
+.seg button.on.note{background:var(--warn);color:var(--accent-ink);border-color:var(--warn)}
+.seg button.on.na{background:var(--muted);color:var(--surface);border-color:var(--muted)}
+.cat textarea{
+  width:100%;min-height:60px;resize:vertical;border:1px solid var(--line);border-radius:9px;
+  background:var(--bg);color:var(--ink);font:inherit;font-size:13px;padding:8px 10px;
+}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field input,.field select{
+  border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);
+  font:inherit;font-size:14px;padding:10px 12px;
+}
+
+.score-big{font-family:'Space Grotesk',sans-serif;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-row .label{flex:0 0 150px;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-row .progress{flex:1}
+.bar-row .pct{flex:0 0 36px;text-align:right;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.growth-item{border-left:3px solid var(--warn);padding-left:12px}
+.growth-item .t{font-weight:700;font-size:14px}
+.growth-item .n{font-size:13px;color:var(--muted);margin-top:2px}
+
+.empty{text-align:center;padding:48px 16px;color:var(--muted)}
+.empty .big{font-size:40px;margin-bottom:8px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:20;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.toast.show{opacity:1}
+
+.photo-row{display:flex;flex-wrap:wrap;gap:8px}
+.photo-thumb{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1px solid var(--line);flex:none}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb .rm{
+  position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;
+  background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:20px;text-align:center;padding:0;cursor:pointer;
+}
+.photo-add{
+  width:72px;height:72px;border-radius:9px;border:1px dashed var(--line);background:var(--bg);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex:none;
+}
+.photo-input{display:none}
+.summary-photos{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.summary-photos .photo-thumb{width:56px;height:56px}
+
+@media print{
+  .no-print{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{max-width:100%;padding:0}
+  .card,.cat{border-color:#ccc;background:#fff}
+  .progress{background:#ddd}
+  a[href]:after{content:""}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "obhod-audit-state-v1";
+
+  var CATEGORIES = [
+    {id:"facade",   title:"Фасад и навигация",              weight:10, desc:"Вывеска видна и подсвечена вечером, витрина чистая и актуальная, указатели входа и режим работы понятны сразу."},
+    {id:"merch",    title:"Мерчендайзинг",                   weight:15, desc:"Зонирование хитов на входе, выкладка по категориям и размерам, крупногабарит без загромождения прохода, ценники и акции актуальны."},
+    {id:"sales",    title:"Работа продавца",                 weight:15, desc:"Встреча и приветствие, выявление потребности вопросами, презентация через выгоды, работа с возражениями, уверенное закрытие."},
+    {id:"upsell",   title:"Допродажи",                       weight:10, desc:"Предложение сопутствующего товара в зале и на кассе, знание действующих акций и комплектов."},
+    {id:"cashier",  title:"Касса",                           weight:10, desc:"Скорость обслуживания, чек предложен клиенту, тёплое прощание с приглашением прийти снова."},
+    {id:"finance",  title:"Финансы (P&L)",                   weight:15, desc:"ФОТ и аренда в пределах нормы к выручке, расходы на рекламу приносят заявки, а не тратятся впустую."},
+    {id:"techopt",  title:"Техническая оптимизация",         weight:10, desc:"Освещение не расходует лишнее, рекламные вывески не переплачивают за подсветку, нет забытых технических расходов."},
+    {id:"safety",   title:"Безопасность (детский ассортимент)", weight:5, desc:"Нет острых углов и доступных мелких деталей, крупногабаритные стеллажи и дисплеи надёжно закреплены."},
+    {id:"impress",  title:"Общее впечатление",                weight:10, desc:"Первое впечатление от входа в магазин, желание порекомендовать его знакомым."}
+  ];
+
+  var PACKAGES = {
+    "Экспресс": ["facade","merch","impress"],
+    "Продажи":  ["facade","merch","sales","upsell","cashier","impress"],
+    "Полный":   CATEGORIES.map(function(c){return c.id;})
+  };
+
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+  function todayISO(){ var d=new Date(); return d.toISOString().slice(0,10); }
+  function fmtDate(iso){
+    var d=new Date(iso+"T00:00:00");
+    return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"});
+  }
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  var MAX_PHOTOS_PER_CAT = 4;
+  var PHOTO_MAX_SIDE = 1600;
+  var PHOTO_QUALITY = 0.75;
+
+  function emptyClient(){
+    var cats={};
+    CATEGORIES.forEach(function(c){ cats[c.id] = {status:null, note:"", photos:[]}; });
+    return {id:uid(), name:"", city:"", package:"Полный", date:todayISO(), categories:cats, created:Date.now()};
+  }
+
+  function compressImage(file){
+    return new Promise(function(resolve, reject){
+      var img = new Image();
+      var reader = new FileReader();
+      reader.onerror = function(){ reject(new Error("read")); };
+      reader.onload = function(){
+        img.onerror = function(){ reject(new Error("decode")); };
+        img.onload = function(){
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(w,h));
+          var cw = Math.max(1, Math.round(w*scale)), ch = Math.max(1, Math.round(h*scale));
+          var canvas = document.createElement("canvas");
+          canvas.width = cw; canvas.height = ch;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, cw, ch);
+          try{
+            resolve(canvas.toDataURL("image/jpeg", PHOTO_QUALITY));
+          }catch(e){ reject(e); }
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(parsed && Array.isArray(parsed.clients)) return parsed;
+      }
+    }catch(e){}
+    return {clients:[], view:"list", currentId:null};
+  }
+
+  var state = loadState();
+
+  function scopeFor(client){
+    return PACKAGES[client.package] || PACKAGES["Полный"];
+  }
+
+  function computeScore(client){
+    var scope = scopeFor(client);
+    var totalW=0, got=0;
+    CATEGORIES.forEach(function(c){
+      if(scope.indexOf(c.id)===-1) return;
+      var entry = client.categories[c.id];
+      if(!entry || !entry.status) return;
+      if(entry.status==="na") return;
+      totalW += c.weight;
+      got += c.weight * (entry.status==="ok" ? 1 : 0.5);
+    });
+    var scopeCount = scope.length;
+    var answeredInScope = scope.filter(function(id){
+      var e=client.categories[id]; return e && e.status;
+    }).length;
+    return {
+      pct: totalW>0 ? Math.round((got/totalW)*100) : null,
+      answered: answeredInScope,
+      total: scopeCount
+    };
+  }
+
+  function scoreClass(pct){
+    if(pct==null) return "";
+    if(pct>=85) return "score-good";
+    if(pct>=65) return "score-warn";
+    return "score-bad";
+  }
+
+  function render(){
+    var app = document.getElementById("app");
+    if(state.view==="detail") app.innerHTML = renderDetail(getClient(state.currentId));
+    else if(state.view==="summary") app.innerHTML = renderSummary(getClient(state.currentId));
+    else app.innerHTML = renderList();
+    bindHandlers();
+  }
+
+  function getClient(id){
+    for(var i=0;i<state.clients.length;i++) if(state.clients[i].id===id) return state.clients[i];
+    return null;
+  }
+
+  function renderList(){
+    var html = '<div class="wrap">';
+    html += '<div class="eyebrow">Обход</div>';
+    html += '<h1 class="title">Проверки магазинов</h1>';
+    html += '<p class="sub">Аудит точек: мерчендайзинг, продажи, финансы и техническая оптимизация.</p>';
+
+    if(state.clients.length===0){
+      html += '<div class="empty"><div class="big">📋</div>Пока нет ни одной проверки.<br>Добавьте первый магазин, чтобы начать.</div>';
+    } else {
+      html += '<div class="stack" style="margin-bottom:20px">';
+      state.clients.slice().sort(function(a,b){return b.created-a.created;}).forEach(function(c){
+        var sc = computeScore(c);
+        var statusLabel = sc.answered===0 ? "Не начато" : (sc.answered<sc.total ? (sc.answered+"/"+sc.total+" пунктов") : (sc.pct+"%"));
+        var chipClass = sc.answered===0 ? "" : (sc.answered<sc.total ? "" : scoreClass(sc.pct));
+        html += '<button class="client-item" data-open="'+c.id+'">'+
+          '<span class="row" style="min-width:0"><span style="min-width:0;overflow:hidden">'+
+          '<div class="name">'+esc(c.name||"Без названия")+'</div>'+
+          '<div class="meta">'+esc(c.city||"—")+' · '+esc(c.package)+' · '+fmtDate(c.date)+'</div>'+
+          '</span></span>'+
+          '<span class="chip '+chipClass+'">'+statusLabel+'</span>'+
+        '</button>';
+      });
+      html += '</div>';
+    }
+
+    html += '<button class="btn primary block" data-add="1">+ Добавить магазин</button>';
+    html += '</div>';
+    return html;
+  }
+
+  function renderDetail(client){
+    if(!client){ state.view="list"; return renderList(); }
+    var scope = scopeFor(client);
+    var sc = computeScore(client);
+    var html = '<div class="wrap">';
+    html += '<div class="topbar"><button class="btn ghost" data-back="1">← Назад</button></div>';
+    html += '<div class="client-head">';
+    html += '<div class="label">'+esc(client.city||"Город не указан")+'</div>';
+    html += '<h1 class="title" style="margin:0">'+esc(client.name||"Без названия")+'</h1>';
+    html += '<div class="row"><span class="pkg-tag">Пакет «'+esc(client.package)+'»</span><span class="label">· '+fmtDate(client.date)+'</span></div>';
+    html += '<div style="margin-top:10px" class="row"><div class="progress" style="flex:1"><div style="width:'+(sc.pct||0)+'%"></div></div><span class="label" style="flex:none">'+(sc.pct==null?"—":sc.pct+"%")+'</span></div>';
+    html += '</div>';
+
+    html += '<div class="stack">';
+    CATEGORIES.forEach(function(c, idx){
+      var inScope = scope.indexOf(c.id)!==-1;
+      var entry = client.categories[c.id] || {status:null, note:"", photos:[]};
+      if(!entry.photos) entry.photos=[];
+      html += '<div class="cat'+(inScope?'':' excluded')+'">';
+      html += '<div class="cat-top"><h3>'+(idx+1)+'. '+esc(c.title)+'</h3><span class="cat-weight">вес '+c.weight+'%</span></div>';
+      html += '<p class="cat-desc">'+esc(c.desc)+'</p>';
+      if(!inScope){
+        html += '<div class="cat-excl-note">Не входит в пакет «'+esc(client.package)+'»</div>';
+      } else {
+        html += '<div class="seg" data-cat="'+c.id+'">';
+        html += '<button class="'+(entry.status==="ok"?"on ok":"")+'" data-status="ok">✓ Ок</button>';
+        html += '<button class="'+(entry.status==="note"?"on note":"")+'" data-status="note">! Замечание</button>';
+        html += '<button class="'+(entry.status==="na"?"on na":"")+'" data-status="na">— Н/П</button>';
+        html += '</div>';
+        if(entry.status==="note"){
+          html += '<textarea data-note="'+c.id+'" placeholder="Что именно не так и что сделать">'+esc(entry.note)+'</textarea>';
+        }
+        html += '<div class="photo-row">';
+        entry.photos.forEach(function(src, pi){
+          html += '<div class="photo-thumb"><img src="'+src+'" alt=""><button class="rm" data-photo-remove="'+c.id+'" data-idx="'+pi+'">×</button></div>';
+        });
+        if(entry.photos.length < MAX_PHOTOS_PER_CAT){
+          html += '<label class="photo-add">+<input class="photo-input" type="file" accept="image/*" capture="environment" multiple data-photo-input="'+c.id+'"></label>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div style="margin-top:20px" class="stack">';
+    html += '<button class="btn primary block" data-finish="1">Готово → Итоги проверки</button>';
+    html += '<button class="btn ghost block" data-delete="1" style="color:var(--bad)">Удалить эту проверку</button>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function renderSummary(client){
+    if(!client){ state.view="list"; return renderList(); }
+    var scope = scopeFor(client);
+    var sc = computeScore(client);
+    var html = '<div class="wrap">';
+    html += '<div class="topbar no-print"><button class="btn ghost" data-back-detail="1">← К чек-листу</button></div>';
+    html += '<div class="eyebrow">Итоги проверки</div>';
+    html += '<h1 class="title">'+esc(client.name||"Без названия")+'</h1>';
+    html += '<p class="sub">'+esc(client.city||"—")+' · '+fmtDate(client.date)+' · пакет «'+esc(client.package)+'»</p>';
+
+    html += '<div class="card" style="text-align:center;margin-bottom:16px">';
+    html += '<div class="score-big" style="color:var(--'+(sc.pct==null?"muted":(scoreClass(sc.pct)==="score-good"?"good":scoreClass(sc.pct)==="score-warn"?"warn":"bad"))+')">'+(sc.pct==null?"—":sc.pct+"%")+'</div>';
+    html += '<div class="label">общий результат по чек-листу</div>';
+    html += '</div>';
+
+    html += '<h3 style="margin-bottom:10px">По разделам</h3>';
+    html += '<div class="card stack" style="margin-bottom:20px">';
+    CATEGORIES.forEach(function(c){
+      if(scope.indexOf(c.id)===-1) return;
+      var entry = client.categories[c.id];
+      var val = !entry || !entry.status ? null : (entry.status==="na" ? null : (entry.status==="ok"?100:50));
+      html += '<div class="bar-row"><span class="label">'+esc(c.title)+'</span><div class="progress"><div style="width:'+(val||0)+'%"></div></div><span class="pct">'+(val==null?"—":val+"%")+'</span></div>';
+      if(entry && entry.photos && entry.photos.length){
+        html += '<div class="summary-photos">';
+        entry.photos.forEach(function(src){
+          html += '<div class="photo-thumb"><img src="'+src+'" alt=""></div>';
+        });
+        html += '</div>';
+      }
+    });
+    html += '</div>';
+
+    var growth = [];
+    CATEGORIES.forEach(function(c){
+      if(scope.indexOf(c.id)===-1) return;
+      var entry = client.categories[c.id];
+      if(entry && entry.status==="note") growth.push({c:c, note:entry.note});
+    });
+    growth.sort(function(a,b){ return b.c.weight - a.c.weight; });
+
+    html += '<h3 style="margin-bottom:10px">Точки роста</h3>';
+    if(growth.length===0){
+      html += '<p class="sub">Замечаний не отмечено — либо всё в порядке, либо чек-лист ещё не заполнен.</p>';
+    } else {
+      html += '<div class="card stack">';
+      growth.forEach(function(g){
+        html += '<div class="growth-item"><div class="t">'+esc(g.c.title)+'</div><div class="n">'+esc(g.note||"Без комментария")+'</div></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="stack no-print" style="margin-top:20px">';
+    html += '<button class="btn primary block" data-copy="1">Скопировать отчёт текстом</button>';
+    html += '<button class="btn ghost block" data-pdf="1">Экспорт в PDF (печать)</button>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildReportText(client){
+    var scope = scopeFor(client);
+    var sc = computeScore(client);
+    var lines = [];
+    lines.push("Отчёт по проверке: "+(client.name||"—"));
+    lines.push((client.city||"—")+" · "+fmtDate(client.date)+" · пакет «"+client.package+"»");
+    lines.push("Общий результат: "+(sc.pct==null?"—":sc.pct+"%"));
+    lines.push("");
+    lines.push("По разделам:");
+    CATEGORIES.forEach(function(c){
+      if(scope.indexOf(c.id)===-1) return;
+      var entry = client.categories[c.id];
+      var mark = !entry || !entry.status ? "не оценено" : (entry.status==="ok"?"Ок":entry.status==="na"?"Н/П":"Замечание");
+      lines.push("- "+c.title+" (вес "+c.weight+"%): "+mark + (entry && entry.status==="note" && entry.note ? " — "+entry.note : ""));
+    });
+    var growth = [];
+    CATEGORIES.forEach(function(c){
+      if(scope.indexOf(c.id)===-1) return;
+      var entry = client.categories[c.id];
+      if(entry && entry.status==="note") growth.push(c.title+(entry.note?": "+entry.note:""));
+    });
+    if(growth.length){
+      lines.push("");
+      lines.push("Точки роста:");
+      growth.forEach(function(g){ lines.push("- "+g); });
+    }
+    return lines.join("\n");
+  }
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1800);
+  }
+
+  function persist(){
+    render();
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      showToast("Память телефона переполнена — удалите немного старых фото");
+    }
+  }
+
+  function bindHandlers(){
+    var app = document.getElementById("app");
+
+    var addBtn = app.querySelector("[data-add]");
+    if(addBtn) addBtn.addEventListener("click", function(){
+      var name = prompt("Название магазина (например: ИП Иванов, обувь)");
+      if(name===null) return;
+      var city = prompt("Город") || "";
+      var c = emptyClient();
+      c.name = name.trim();
+      c.city = city.trim();
+      state.clients.push(c);
+      state.view="detail";
+      state.currentId=c.id;
+      persist();
+    });
+
+    app.querySelectorAll("[data-open]").forEach(function(el){
+      el.addEventListener("click", function(){
+        state.view="detail";
+        state.currentId = el.getAttribute("data-open");
+        render();
+      });
+    });
+
+    var backBtn = app.querySelector("[data-back]");
+    if(backBtn) backBtn.addEventListener("click", function(){
+      state.view="list"; state.currentId=null; render();
+    });
+
+    var backDetail = app.querySelector("[data-back-detail]");
+    if(backDetail) backDetail.addEventListener("click", function(){
+      state.view="detail"; render();
+    });
+
+    app.querySelectorAll(".seg").forEach(function(seg){
+      var catId = seg.getAttribute("data-cat");
+      seg.querySelectorAll("button").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          var client = getClient(state.currentId);
+          var status = btn.getAttribute("data-status");
+          var entry = client.categories[catId];
+          entry.status = (entry.status===status) ? null : status;
+          if(entry.status!=="note") entry.note="";
+          persist();
+        });
+      });
+    });
+
+    app.querySelectorAll("[data-note]").forEach(function(ta){
+      var catId = ta.getAttribute("data-note");
+      ta.addEventListener("blur", function(){
+        var client = getClient(state.currentId);
+        client.categories[catId].note = ta.value;
+        persist();
+      });
+    });
+
+    app.querySelectorAll("[data-photo-input]").forEach(function(input){
+      var catId = input.getAttribute("data-photo-input");
+      input.addEventListener("change", function(){
+        var files = Array.prototype.slice.call(input.files||[]);
+        if(!files.length) return;
+        var client = getClient(state.currentId);
+        var entry = client.categories[catId];
+        if(!entry.photos) entry.photos=[];
+        var slots = MAX_PHOTOS_PER_CAT - entry.photos.length;
+        if(slots<=0){ showToast("Максимум "+MAX_PHOTOS_PER_CAT+" фото на раздел"); return; }
+        files = files.slice(0, slots);
+        Promise.all(files.map(function(f){ return compressImage(f).catch(function(){ return null; }); }))
+          .then(function(results){
+            results.forEach(function(dataUrl){ if(dataUrl) entry.photos.push(dataUrl); });
+            persist();
+          });
+      });
+    });
+
+    app.querySelectorAll("[data-photo-remove]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var catId = btn.getAttribute("data-photo-remove");
+        var idx = parseInt(btn.getAttribute("data-idx"),10);
+        var client = getClient(state.currentId);
+        var entry = client.categories[catId];
+        if(entry.photos) entry.photos.splice(idx,1);
+        persist();
+      });
+    });
+
+    var finishBtn = app.querySelector("[data-finish]");
+    if(finishBtn) finishBtn.addEventListener("click", function(){
+      state.view="summary"; render();
+    });
+
+    var delBtn = app.querySelector("[data-delete]");
+    if(delBtn) delBtn.addEventListener("click", function(){
+      if(delBtn.getAttribute("data-armed")==="1"){
+        state.clients = state.clients.filter(function(c){ return c.id!==state.currentId; });
+        state.view="list"; state.currentId=null;
+        persist();
+      } else {
+        delBtn.setAttribute("data-armed","1");
+        delBtn.textContent = "Нажмите ещё раз для удаления";
+      }
+    });
+
+    var copyBtn = app.querySelector("[data-copy]");
+    if(copyBtn) copyBtn.addEventListener("click", function(){
+      var client = getClient(state.currentId);
+      var text = buildReportText(client);
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          showToast("Отчёт скопирован");
+        }).catch(function(){ fallbackCopy(text); });
+      } else {
+        fallbackCopy(text);
+      }
+    });
+
+    var pdfBtn = app.querySelector("[data-pdf]");
+    if(pdfBtn) pdfBtn.addEventListener("click", function(){
+      window.print();
+    });
+
+    function fallbackCopy(text){
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try{ document.execCommand("copy"); showToast("Отчёт скопирован"); }
+      catch(e){ showToast("Не удалось скопировать"); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
